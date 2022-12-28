@@ -1,0 +1,57 @@
+rules:
+  - id: improper_biometric_auth
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://github.com/OWASP/owasp-mastg/blob/master/Document/0x06f-Testing-Local-Authentication.md
+        - https://developer.apple.com/documentation/localauthentication/logging_a_user_into_your_app_with_face_id_or_touch_id
+      category: security
+    message: >-
+      This iOS mobile application does not implement properly the Biometric Authentication mechanism, because
+      is using the Local Authentication framework or the Security framework configured with a weak Keychain
+      flag (as: kSecAccessControlBiometryAny, kSecAccessControlTouchIDAny, or kSecAccessControlUserPresence). 
+      In the first case an attacker could be able to bypass the biometric authentication checks. In the
+      latter an attacker could enroll his biometric data to authenticate or could also authenticate using
+      a registered passcode instead of biometric data.
+      In sensitive contexts, it is recommended to implement Biometric Authentication controls using the Security
+      framework properly configured as stated in the official security guidelines for iOS. 
+      Specifically, the Security framework should be configured with the method "SecAccessControlCreateWithFlags"
+      having the "protection" argument set to "kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly" or
+      "kSecAttrAccessibleWhenPasscodeSet" values. In addition, the "flags" argument of the method
+      "SecAccessControlCreateWithFlags" should be set with any of the Keychain flags considered more secure
+      (kSecAccessControlBiometryCurrentSet or kSecAccessControlTouchIDCurrentSet). 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-inside: |
+                  let $CONTEXT = LAContext()
+                  ...
+                  $CONTEXT.evaluatePolicy(...)
+          - patterns:
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, kSecAccessControlBiometryCurrentSet, ...)
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, kSecAccessControlTouchIDCurrentSet, ...)
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, $X.biometryCurrentSet, ...)
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly, $X.touchIDCurrentSet, ...)
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSet, kSecAccessControlBiometryCurrentSet, ...)
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSet, kSecAccessControlTouchIDCurrentSet, ...)
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSet, $X.biometryCurrentSet, ...)
+              - pattern-not-inside: |
+                  let $AUTHCONTROL = SecAccessControlCreateWithFlags(..., kSecAttrAccessibleWhenPasscodeSet, $X.touchIDCurrentSet, ...)
+              - pattern-either:
+                  - pattern-inside: |
+                      let $AUTHCONTROL = SecAccessControlCreateWithFlags(...)
+                  - pattern-inside: |
+                      let $AUTHCONTROL = SecAccessControlCreateWithFlags(...)!
+                  - pattern-inside: |
+                      guard let $AUTHCONTROL = SecAccessControlCreateWithFlags(...) else {...}
+                  - pattern-inside: |
+                      guard let $AUTHCONTROL = SecAccessControlCreateWithFlags(...)! else {...}
