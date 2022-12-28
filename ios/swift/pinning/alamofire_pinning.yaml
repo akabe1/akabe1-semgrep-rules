@@ -1,0 +1,75 @@
+rules:
+  - id: alamofire_pinning
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://owasp.org/www-community/controls/Certificate_and_Public_Key_Pinning
+        - https://developer.apple.com/news/?id=g9ejcf8y
+        - https://cwe.mitre.org/data/definitions/295.html
+        - https://cwe.mitre.org/data/definitions/297.html
+        - https://cwe.mitre.org/data/slices/919.html
+      category: security
+    message: >-
+      This iOS mobile application seems not implementing properly the Certificate Pinning checks when
+      connecting to external web servers, with AlamoFire libraries. 
+      An attacker could be able to abuse this vulnerability in order to intercept the communications
+      and perform MitM attacks. 
+      It is recommended to implement the proper Certificate Pinning controls in the iOS mobile application
+      following the official security guidelines for iOS. 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          # AlamoFire old versions with improper pinning configurations (pinning disabled for some domain, not validating hostname, or not validating chain of certs entirely)
+          - patterns:
+            - pattern-inside: |
+                let $SERVERTRUSTPOLICIES: [String: ServerTrustPolicy] = $VALUE
+            - metavariable-regex:
+                metavariable: $VALUE
+                regex: (?i)\[([\s\S]*?)(?=DisableEvaluation)([\s\S]*?)\]
+          - patterns:
+              # Match both PinCertificates() and PinPublicKeys()
+              - pattern-inside: |
+                  let $SERVERTRUSTPOLICIES: [String: ServerTrustPolicy] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=validateCertificateChain:\s?false)([\s\S]*?)\]
+          - patterns:
+              # Match both PinCertificates() and PinPublicKeys()
+              - pattern-inside: |
+                  let $SERVERTRUSTPOLICIES: [String: ServerTrustPolicy] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=validateHost:\s?false)([\s\S]*?)\]
+          # AlamoFire 5.x with improper pinning configurations (pinning disabled for some domain, not validating hostname, or accepting self-signed certs)
+          - patterns:
+              - pattern-inside: |
+                  let $TRUSTMANAGER = ServerTrustManager(..., [$X: DisabledEvaluator()], ...)
+          - patterns:
+              - pattern-inside: |
+                  let $SESSION = Session(..., serverTrustManager: ServerTrustManager(evaluators: [$X: DisabledTrustEvaluator()]), ...) 
+          - patterns:
+              - pattern-either:
+                  - pattern: |
+                      let $EVALUATORS = [$X: DefaultTrustEvaluator(..., validateHost: false, ...)]
+                  - pattern: |
+                      let $EVALUATORS = [$X: DefaultTrustEvaluator(..., acceptSelfSignedCertificates: true, ...)]
+          - patterns:
+              - pattern-either:
+                  - pattern: |
+                      let $EVALUATORS = [$X: PublicKeysTrustEvaluator(..., validateHost: false, ...)]
+                  - pattern: |
+                      let $EVALUATORS = [$X: PublicKeysTrustEvaluator(..., acceptSelfSignedCertificates: true, ...)]
+          - patterns:
+              - pattern-inside: |
+                  let $SERVERTRUSTPOLICIES = $EVALUATOR(..., validateHost: false, ...)
+              - metavariable-regex:
+                  metavariable: $EVALUATOR
+                  regex: (?i)(PinnedCertificatesTrustEvaluator|PublicKeysTrustEvaluator)
+          - patterns:
+              - pattern-inside: |
+                  let $SERVERTRUSTPOLICIES = $EVALUATOR(..., acceptSelfSignedCertificates: true, ...)
+              - metavariable-regex:
+                  metavariable: $EVALUATOR
+                  regex: (?i)(PinnedCertificatesTrustEvaluator|PublicKeysTrustEvaluator)
+          
