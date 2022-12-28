@@ -1,0 +1,109 @@
+rules:
+  - id: none_file_protection_part1
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06d-Testing-Data-Storage/
+        - https://developer.apple.com/documentation/foundation/nsfileprotectionnone
+        - https://developer.apple.com/documentation/foundation/nsdatawritingoptions/nsdatawritingfileprotectionnone
+      category: security
+    message: >-
+      This iOS mobile application seems using a insufficient data protection class when storing some
+      files locally into the device. The usage of the data protection class "NSFileProtectionNone" or
+      "FileProtectionType.none" means that the file is encrypted using a key derived only from the
+      device's UID. The usage of the file write option "NSDataWritingOptions.DataWritingFileProtectionNone"
+      instead allows to save unencrypted the file into the device. In both cases the file is accessible
+      any time the device is powered on, including when locked with a passcode or when booting.
+      This configuration could expose, under certain circumstances (i.e. jailbroken device), these files
+      to undesiderated accesses.
+      It is suggested to use the data protection class "NSFileProtectionComplete" or "FileProtectionType.complete"
+      or the file write option "NSDataWritingOptions.DataWritingFileProtectionComplete" when storing files
+      containing reserved data. 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-inside: |
+                  let $PROT = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)\]          
+          - patterns:
+              - pattern-inside: |
+                  $DATA.$WRITE(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $WRITE
+                  regex: (?i)(write|writeToURL|writeToFile)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  $DATA.$WRITE(..., $X: $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $WRITE
+                  regex: (?i)(write|writeToURL|writeToFile)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  NSFileManager.defaultManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  NSFileManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  try NSFileManager.defaultManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  try NSFileManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  let $NSFM = NSFileManager()
+                  ...
+                  $NSFM.setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  let $NSFM = NSFileManager()
+                  ...
+                  try $NSFM.setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  FileManager.default.setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  FileManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         
+          - patterns:
+              - pattern-inside: |
+                  $FM = FileManager()
+                  ...
+                  $FM.setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionNone|DataWritingFileProtectionNone|FileProtectionType\.none))(.*?)         

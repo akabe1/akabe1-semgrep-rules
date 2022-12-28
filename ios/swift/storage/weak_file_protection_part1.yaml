@@ -1,0 +1,113 @@
+rules:
+  - id: weak_file_protection_part1
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06d-Testing-Data-Storage/
+        - https://developer.apple.com/documentation/foundation/nsfileprotectioncompleteunlessopen
+        - https://developer.apple.com/documentation/foundation/nsfileprotectioncompleteuntilfirstuserauthentication
+        - https://developer.apple.com/documentation/uikit/protecting_the_user_s_privacy/encrypting_your_app_s_files
+      category: security
+    message: >-
+      This iOS mobile application seems using a weak data protection class when storing some
+      files locally into the device, this configuration could expose the files to undesiderated
+      accesses because the data remain accessible under certain circumstances (i.e. jailbroken device).
+      In particular, the FileProtectionType weak classes that should be used carefully are:
+      - "NSFileProtectionCompleteUnlessOpen"
+      - "FileProtectionType.completeUnlessOpen"
+      - "NSFileProtectionCompleteUntilFirstUserAuthentication" (default value on iOS)
+      - "FileProtectionType.completeUntilFirstUserAuthentication"
+      and the weak file write options are:
+      - "DataWritingFileProtectionCompleteUnlessOpen"
+      - "DataWritingFileProtectionCompleteUntilFirstUserAuthentication"
+      When saving reserved data in local files it is suggested to use any of the secure data protection classes
+      "NSFileProtectionComplete" and "FileProtectionType.complete", or the secure file write option
+      "NSDataWritingOptions.DataWritingFileProtectionComplete". 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-inside: |
+                  let $PROT = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)\]          
+          - patterns:
+              - pattern-inside: |
+                  $DATA.$WRITE(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $WRITE
+                  regex: (?i)(write|writeToURL|writeToFile)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  $DATA.$WRITE(..., $X: $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $WRITE
+                  regex: (?i)(write|writeToURL|writeToFile)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  NSFileManager.defaultManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  NSFileManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                 try NSFileManager.defaultManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  try NSFileManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+               - pattern-inside: |
+                   let $NSFM = NSFileManager()
+                   ...
+                   $NSFM.setAttributes(..., $VALUE, ...)
+               - metavariable-regex:
+                   metavariable: $VALUE
+                   regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  let $NSFM = NSFileManager()
+                  ...
+                  try $NSFM.setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  FileManager.default.setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  FileManager().setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  $FM = FileManager()
+                  ...
+                  $FM.setAttributes(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=(NSFileProtectionCompleteUnlessOpen|DataWritingFileProtectionCompleteUnlessOpen|FileProtectionType\.completeUnlessOpen|NSFileProtectionCompleteUntilFirstUserAuthentication|DataWritingFileProtectionCompleteUntilFirstUserAuthentication|FileProtectionType\.completeUntilFirstUserAuthentication))(.*?)
