@@ -1,0 +1,174 @@
+rules:
+  - id: improper_wkwebview
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06h-Testing-Platform-Interaction
+        - https://developer.apple.com/documentation/webkit/wkwebview
+      category: security
+    message: >-
+      This iOS mobile application seems using a WKWebView object weakly configured from a security
+      point of view, as its settings present any of the following flaws:
+        - WKWebView has JavaScript support not explicitly disabled (enabled by default)
+        - WKWebView has enabled JavaScript to access content from other "file://" scheme URLs (allowFileAccessFromFileURLs default false)
+        - WKWebView has enabled JavaScript to access content from any origin (allowUniversalAccessFromFileURLs default false)
+        - WKWebView is using a JavaScript to Native bridge which could potentially expose sensitive data (WKScriptMessageHandler)
+      This configuration of WKWebView increases the attack surface of the mobile app and could lead to various
+      kind of vulnearbilities (i.e. reflected XSS, code injection, information disclosure, etc.).
+      If possible it is recommended to configure WKWebView in the mobile app with JavaScript disabled, also
+      avoiding to expose sensitive data via JavaScript to Native bridge, and disabling the permission to access content from
+      any origin or other file scheme URLs.
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          # WKWebView with JavaScript enabled
+          - patterns:
+              - pattern: |
+                  let $PREFS = WKPreferences()
+                  ...
+                  let $WEBVIEW = WKWebView(...)
+                  ...
+                  $WEBVIEW.$LOADFUNC(...)
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData)
+              - pattern-not-inside: |
+                  func $FUNC() {
+                      ...
+                      $PREFS.javaScriptEnabled = false
+                      ...
+                  }
+          - patterns:
+              - pattern-inside: |
+                  let $PREFS = WKPreferences()
+                  ...
+                  let $WEBVIEW : WKWebView
+                  ...
+                  $WEBVIEW.$LOADFUNC(...)
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData)
+              - pattern-not-inside: |
+                  func $FUNC() {
+                      ...
+                      $PREFS.javaScriptEnabled = false
+                      ...
+                  }
+          - patterns:
+              - pattern-inside: |
+                  let $PREFS = WKWebpagePreferences()
+                  ...
+                  let $WEBVIEW = WKWebView(...)
+                  ...
+                  $WEBVIEW.$LOADFUNC(...)
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData)
+              - pattern-not-inside: |
+                  func $FUNC() {
+                      ...
+                      $PREFS.allowsContentJavaScript = false
+                      ...
+                  }
+          - patterns:
+              - pattern-inside: |
+                  let $PREFS = WKWebpagePreferences()
+                  ...
+                  let $WEBVIEW : WKWebView
+                  ...
+                  $WEBVIEW.$LOADFUNC(...)
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData)
+              - pattern-not-inside: |
+                  func $FUNC() {
+                      ...
+                      $PREFS.allowsContentJavaScript = false
+                      ...
+                  }
+          - patterns:       
+              - pattern-inside: |
+                  func $FUNC() {
+                    ...
+                    let $WEBVIEW = WKWebView(...)
+                    ...
+                    $WEBVIEW.$LOADFUNC(...)
+                    ...
+                  }
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData)
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    let $PREFS = WKPreferences()
+                    ...
+                  }
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    let $PREFS = WKWebpagePreferences()
+                    ...
+                  }
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    $WEBVIEW.configuration.preferences.javaScriptEnabled = false
+                    ...
+                  }
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    $WEBVIEW.configuration.defaultWebpagePreferences.allowsContentJavaScript = false 
+                    ...
+                  }
+          - patterns:       
+              - pattern-inside: |
+                  func $FUNC() {
+                    ...
+                    let $WEBVIEW : WKWebView
+                    ...
+                    $WEBVIEW.$LOADFUNC(...)
+                    ...
+                  }
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData)
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    let $PREFS = WKPreferences()
+                    ...
+                  }
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    let $PREFS = WKWebpagePreferences()
+                    ...
+                  }
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    $WEBVIEW.configuration.preferences.javaScriptEnabled = false
+                    ...
+                  }
+              - pattern-not-inside: |
+                  func $FUNC() {
+                    ...
+                    $WEBVIEW.configuration.defaultWebpagePreferences.allowsContentJavaScript = false
+                    ...
+                  }
+          # WKWebView with JavaScript enabled to access content from other "file://" scheme URL, or from any origin
+          - patterns:
+              - pattern-either:
+                  - pattern: $PREFS.allowFileAccessFromFileURLs = true
+                  - pattern: $PREFS.allowUniversalAccessFromFileURLs = true
+                  - pattern: |
+                      $WEBVIEW.configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+                  - pattern: |
+                      $WEBVIEW.configuration.preferences.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+          - patterns:
+              # JavaScript to Native bridge bad practice
+              - pattern: |
+                  message.$WEBVIEW?.evaluateJavaScript(...)
