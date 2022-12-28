@@ -1,0 +1,63 @@
+rules:
+  - id: exportable_keychain
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06d-Testing-Data-Storage/
+        - https://developer.apple.com/documentation/security/keychain_services
+        - https://support.apple.com/guide/security/keychain-data-protection-secb0694df1a/web
+      category: security
+    message: >-
+      This iOS mobile application seems configured with an exportable Keychain protection, when the
+      accessibility level do not contain the "ThisDeviceOnly" suffix, then the Keychain data could be
+      backed up to iCloud or via iTunes even if using unencrypted backups which can be restored to any
+      device. Depending on how sensitive and private the stored data is, this may raise a privacy concern.
+      When storing sensitive data it is recommended to use an high protection level for Keychain data having
+      the "ThisDeviceOnly" suffix. Note that by default the kSecAttrAccessible flag for Keychain is set
+      to "kSecAttrAccessibleWhenUnlocked".
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-inside: |
+                  $QUERY[kSecAttrAccessible as String] = $KEYCHAINPROTECTION
+              - metavariable-regex:
+                  metavariable: $KEYCHAINPROTECTION
+                  regex: (?i)(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock)
+          - patterns:
+              - pattern-inside: |
+                  $QUERY[kSecAttrAccessible] = $KEYCHAINPROTECTION
+              - metavariable-regex:
+                  metavariable: $KEYCHAINPROTECTION
+                  regex: (?i)(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock)
+          - patterns:
+              - pattern-inside: |
+                  $QUERY = $VALUE as CFDictionary
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)
+          - patterns:
+              - pattern-inside: |
+                  var $QUERY: [String: Any] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
+          - patterns:
+              - pattern-inside: |
+                  let $QUERY: [String: Any] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
+          - patterns:
+              - pattern-inside: |
+                  var $QUERY: [NSString: Any] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
+          - patterns:
+              - pattern-inside: |
+                  let $QUERY: [NSString: Any] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
