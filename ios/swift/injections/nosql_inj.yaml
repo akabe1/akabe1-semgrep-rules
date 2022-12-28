@@ -1,0 +1,57 @@
+rules:
+  - id: nosql_inj
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://capec.mitre.org/data/definitions/676.html
+        - https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.6-Testing_for_NoSQL_Injection
+      category: security
+    message: >-
+      This iOS mobile application could be vulnerable to NoSQL Injection, because the NoSQL queries
+      are built dynamically as string by concatenating code and untrusted input.
+      A successful NoSQL injection exploit, similar to that of a SQL injection, could allow an attacker
+      to bypass authentication, read sensitive data from database, modify database data (Insert/Update/Delete),
+      or even compromise the database and the underlying server. 
+      It is recommended to avoid to build NoSQL queries with string concatenation of code and
+      untrusted input, if this is needed at least a strong validation/sanitization of input
+      should be performed. 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: |
+                  $NOSQL = realm.objects($OBJ).filter($X + $Y)
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ^("([\s\S]*)"|'([\s\S]*)')
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+          - patterns:
+              - pattern: |
+                  $NOSQL = realm.objects($OBJ).filter($X + $Y + ...)
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ^("([\s\S]*)"|'([\s\S]*)')
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+          - patterns:
+              - pattern: |
+                  $NOSQL = realm.objects($OBJ).filter($X + ... + $Y)
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ^("([\s\S]*)"|'([\s\S]*)')
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+          - patterns:
+              - pattern: |
+                  $NOSQL = realm.objects($OBJ).filter($X + ... + $Y + ...)
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ^("([\s\S]*)"|'([\s\S]*)')
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+    
