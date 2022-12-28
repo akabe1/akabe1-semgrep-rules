@@ -1,0 +1,48 @@
+rules:
+  - id: trustkit_pinning
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://owasp.org/www-community/controls/Certificate_and_Public_Key_Pinning
+        - https://developer.apple.com/news/?id=g9ejcf8y
+        - https://cwe.mitre.org/data/definitions/295.html
+        - https://cwe.mitre.org/data/definitions/297.html
+        - https://cwe.mitre.org/data/slices/919.html
+      category: security
+    message: >-
+      This iOS mobile application seems not implementing properly the Certificate Pinning checks when
+      connecting to external web servers, with TrustKit libraries. 
+      An attacker could be able to abuse this vulnerability in order to intercept the communications
+      and perform MitM attacks. 
+      It is recommended to implement the proper Certificate Pinning controls in the iOS mobile application
+      following the official security guidelines for iOS. 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          # TrustKit with improper pinning configurations (pinning disabled or disabled for subdomains)
+          - patterns:
+              - pattern-inside: |
+                  let $TRUSTKITCONF: [String: Any] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=kTSKEnforcePinning:\s?false)([\s\S]*?)\]
+          - patterns:
+              - pattern-inside: |
+                  let $TRUSTKITCONF: [String: Any] = $VALUE
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=kTSKIncludeSubdomains:\s?false)([\s\S]*?)\]
+          - patterns:
+              - pattern-inside: |
+                  let $TRUSTKITCONF = $VALUE as [String: Any] 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=kTSKEnforcePinning:\s?false)([\s\S]*?)\]
+          - patterns:
+              - pattern-inside: |
+                  let $TRUSTKITCONF = $VALUE as [String: Any] 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)\[([\s\S]*?)(?=kTSKIncludeSubdomains:\s?false)([\s\S]*?)\]
+         
