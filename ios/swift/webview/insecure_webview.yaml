@@ -1,0 +1,60 @@
+rules:
+  - id: insecure_webview
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06h-Testing-Platform-Interaction
+        - https://developer.apple.com/documentation/webkit/replacing_uiwebview_in_your_app
+        - https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller
+      category: security
+    message: >-
+      This iOS mobile application seems using an insecure WebView in-app browser, which could expose
+      to various kind of vulnerabilities.
+      More specifically, the usage of the deprecated UIWebView should be avoided, because it
+      suffers of various security issues. Also the usage of SFSafariViewController should be avoided in
+      sensitive contexts, because it presents various potential security flaws (i.e. JavaScript disabling
+      not supported, cookies and other data shared with Safari browser, etc.).
+      An attacker could abuse this issue to perform various kind of injection attacks (like: XSS, code
+      injection, stealing of reserved information, etc.).
+      It is recommended to use the WKWebView component properly configured in the mobile app, if the usage
+      of SFSafariViewController is a requirements, it is suggested to adopt it only in trusted contexts.
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          # UIWebView found
+          - patterns:
+              - pattern-inside: |
+                  let $WEBVIEW = UIWebView()
+                  ...
+                  $WEBVIEW.$LOADFUNC(...)
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData|loadRequest)
+          #- patterns:
+          #    - pattern-inside: |
+          #        @IBOutlet weak var $WEBVIEW: UIWebView
+          - patterns:
+              - pattern-inside: |
+                  class $CLASS: $X {
+                    ...
+                    var $WEBVIEW: UIWebView
+                    ...
+                    func $FUNC() {
+                      ...
+                      $WEBVIEW.$LOADFUNC(...)
+                      ...
+                    }
+                    ...
+                  }
+              - metavariable-regex:
+                  metavariable: $LOADFUNC
+                  regex: (?i)(loadHTMLString|loadData|loadRequest)
+          # SFSafariViewController found
+          - patterns:
+              - pattern-inside: |
+                  $VIEWCON = SFSafariViewController(...)
+          - patterns:       
+              - pattern-inside: |
+                   var $VIEWCON: SFSafariViewController 
+      
