@@ -1,0 +1,39 @@
+rules:
+  - id: critical_device_features
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://owasp.org/www-project-automated-threats-to-web-applications/assets/oats/EN/OAT-017_Spamming
+        - https://owasp.org/www-pdf-archive/AMS_OWASP.pdf
+      category: security
+    message: >-
+      This iOS mobile application seems calling critical device features (like: send SMS, make phone call,
+      or send email) during its functioning. 
+      Given the sensitivity of these features developers must take caution when using them, because
+      theyir misuse could expose the users to various kind of attacks (i.e. sending reserved data via
+      cleartext SMS, spamming via emails/SMS, unintended phone call frauds, etc.).  
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-either:
+                  # Found email and/or SMS controllers
+                  - pattern: |
+                      $OBJ = MFMailComposeViewController(...) 
+                  - pattern: |
+                      $OBJ = MFMessageComposeViewController(...)
+          - patterns:
+              # Found urls of phone call, SMS and/or email
+              - pattern-inside: |
+                  $OBJ = URL(string: $VALUE)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)"(tel|sms|mailto)://[\s\S]*"
+          - patterns:
+              # Found nsurls of phone call, SMS and/or email
+              - pattern-inside: |
+                  $OBJ = NSURL(string: $VALUE)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)"(tel|sms|mailto):[\s\S]*"
