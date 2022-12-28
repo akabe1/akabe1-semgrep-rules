@@ -1,0 +1,171 @@
+rules:
+  - id: log_inj
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://owasp.org/www-community/attacks/Log_Injection
+        - https://owasp.org/www-community/Injection_Flaws
+        - https://cwe.mitre.org/data/definitions/117.html
+      category: security
+    message: >-
+      This iOS mobile application could be vulnerable to Log Injection, as it seems that some
+      untrusted input data is put into a logger without properly neutralizing it. 
+      This kind of vulnerabilities could lead to log forging, or injection of malicious
+      content (i.e. XSS stored).
+      It is suggested to perform output escaping and/or input validation/sanitization of
+      untrusted input before write it on logs.
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          #Unvalidated input from app text fields
+          #Trying to catch textfields like --> @IBOutlet weak var textFieldName: UITextField!
+          - patterns: 
+              - pattern-inside: |
+                  class $CLASS: $X {
+                      ...
+                      var $INPUT: $TEXTFIELD
+                      ...
+                      func $FUNC() {
+                          ...
+                          NSLog("=~/.*(%@).*/", $INPUT.text)
+                          ...
+                      }
+                      ...
+                  }
+              - metavariable-regex:
+                  metavariable: $TEXTFIELD
+                  regex: (?i)(.*?)(?=TextField)([!]?)
+
+          - patterns:
+              - pattern-inside: |
+                  class $CLASS: $X {
+                      ...
+                      var $INPUT: $TEXTFIELD
+                      ...
+                      func $FUNC() {
+                        ...
+                        let $VALUE = $INPUT.text
+                        ...
+                        NSLog("=~/.*(%@).*/", $INPUT.text)
+                        ...
+                      }
+                      ...
+                  }
+              - metavariable-regex:
+                  metavariable: $TEXTFIELD
+                  regex: (?i)(.*?)(?=TextField)([!]?)
+        #Unvalidated input from WebView
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.stringByEvaluatingJavaScript(...).$READ
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+              - metavariable-regex:
+                  metavariable: $READ
+                  regex: (?i)(value|innerText)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.stringByEvaluatingJavaScript(...)
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.stringByEvaluatingJavaScript(...)!
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.stringByEvaluatingJavaScriptFromString(...)
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.stringByEvaluatingJavaScriptFromString(...)!
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.request?.mainDocumentURL
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.request!.url!.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.request!.url?.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.request.url?.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = $WEBVIEW.request.url.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request.url?.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request!.url?.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request!.url!.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request.url.absoluteString
+                  ...
+                  NSLog("=~/.*(%@).*/", $INPUT)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request.url?.absoluteString
+                  ...
+                  $COMP = URLComponents(...)
+                  ...
+                  NSLog("=~/.*(%@).*/", $COMP.$ITEM)
+              - metavariable-regex:
+                  metavariable: $ITEM
+                  regex: (?i)(host|scheme|query|percentEncodedQuery|fragmqnt|password|path|port|user)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request!.url?.absoluteString
+                  ...
+                  $COMP = URLComponents(...)
+                  ...
+                  NSLog("=~/.*(%@).*/", $COMP.$ITEM)
+              - metavariable-regex:
+                  metavariable: $ITEM
+                  regex: (?i)(host|scheme|query|percentEncodedQuery|fragmqnt|password|path|port|user)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request!.url!.absoluteString
+                  ...
+                  $COMP = URLComponents(...)
+                  ...
+                  NSLog("=~/.*(%@).*/", $COMP.$ITEM)
+              - metavariable-regex:
+                  metavariable: $ITEM
+                  regex: (?i)(host|scheme|query|percentEncodedQuery|fragmqnt|password|path|port|user)
+          - patterns:
+              - pattern-inside: |
+                  $INPUT = navigationAction.request.url.absoluteString
+                  ...
+                  $COMP = URLComponents(...)
+                  ...
+                  NSLog("=~/.*(%@).*/", $COMP.$ITEM)
+              - metavariable-regex:
+                  metavariable: $ITEM
+                  regex: (?i)(host|scheme|query|percentEncodedQuery|fragmqnt|password|path|port|user)                  
