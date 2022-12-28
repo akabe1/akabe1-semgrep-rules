@@ -1,0 +1,57 @@
+rules:
+  - id: afnetworking_pinning
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://owasp.org/www-community/controls/Certificate_and_Public_Key_Pinning
+        - https://developer.apple.com/news/?id=g9ejcf8y
+        - https://cwe.mitre.org/data/definitions/295.html
+        - https://cwe.mitre.org/data/definitions/297.html
+        - https://cwe.mitre.org/data/slices/919.html
+      category: security
+    message: >-
+      This iOS mobile application seems not implementing properly the Certificate Pinning checks when
+      connecting to external web servers, with AFNetworking libraries. 
+      An attacker could be able to abuse this vulnerability in order to intercept the communications
+      and perform MitM attacks. 
+      It is recommended to implement the proper Certificate Pinning controls in the iOS mobile application
+      following the official security guidelines for iOS. 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          # AFNetworking with improper pinning configurations (pinning disabled, validation disabled for hostname/subdomains, or allowing invalid certificates)
+          - patterns:
+              # By default in AFNetworking the pinning is disabled
+              - pattern-inside: |
+                  let $SECURITYPOLICY = AFSecurityPolicy.default()
+          - patterns:
+              - pattern-inside: |
+                  let $SECURITYPOLICY = AFSecurityPolicy(pinningMode: $VALUE)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=AFSSLPinningMode.none)(.*?)
+          - patterns:
+              - pattern-inside: |
+                  let $SECURITYPOLICY = AFSecurityPolicy(pinningMode: $VALUE)
+                  ...
+                  $SECURITYPOLICY.validatesDomainName = false
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=AFSSLPinningMode.(certificate|publickey))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  let $SECURITYPOLICY = AFSecurityPolicy(pinningMode: $VALUE)
+                  ...
+                  $SECURITYPOLICY.validatesCertificateChain = false
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=AFSSLPinningMode.(certificate|publickey))(.*?)
+          - patterns:
+              - pattern-inside: |
+                  let $SECURITYPOLICY = AFSecurityPolicy(pinningMode: $VALUE)
+                  ...
+                  $SECURITYPOLICY.allowInvalidCertificates = true
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: (?i)(.*?)(?=AFSSLPinningMode.(certificate|publickey))(.*?)
