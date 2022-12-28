@@ -1,0 +1,133 @@
+rules:
+  - id: insecure_storage
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06d-Testing-Data-Storage/
+        - https://cwe.mitre.org/data/definitions/311.html
+      category: security
+    message: >-
+      This iOS mobile application seems using a insecure storage mechanism, that does not guarantee
+      its confidentiality, to store some data locally into the device. 
+      In particular, there are some insecure storage methods offered by the platform which save the
+      data in cleartext (i.e. storing into PLIST files, using "UIImageWriteToSavedPhotosAlbum",
+      using "NSKeyedArchiver", using "NSUserDefaults", etc.).
+      An attacker could be able in some circumstances (i.e. jailbroken device) to exploit this issue
+      and retrieve the stored data.
+      It is recommended to adopt any of the encryption methods/tools internationally recognized as
+      strong for iOS (adapt to the specific mobile application context), when saving reserved data
+      into the device.
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              # Find UIImageWriteToSavedPhotosAlbum which does not encrypt media
+              - pattern: UIImageWriteToSavedPhotosAlbum(...)
+          - patterns:
+              # Find NSKeyedArchiver which does not encrypt data
+              - pattern-either: 
+                  - pattern: |
+                      $DATA = try NSKeyedArchiver.archivedData(...)
+                  - pattern: |
+                      $DATA = NSKeyedArchiver.archivedData(...)
+          - patterns:
+              # Find NSUserDefaults which does not encrypt data
+              - pattern: |
+                  UserDefaults.standard.set($VALUE, forKey: $KEY)
+              - metavariable-regex:
+                  metavariable: $KEY
+                  regex: (?i)(.*?)(?=(secret|password|pwd|psw|credit|card|cvv|key|crypto|pin))(.*?)
+          - patterns:
+              # Find NSUserDefaults (old version) which does not encrypt data
+              - pattern: |
+                  NSUserDefaults.standardUserDefaults().setObject($VALUE, forKey: $KEY)
+              - metavariable-regex:
+                  metavariable: $KEY
+                  regex: (?i)(.*?)(?=(secret|password|pwd|psw|credit|card|cvv|key|crypto|pin))(.*?)
+          - patterns:
+              # Find PLIST file reading 
+              - pattern-inside: |
+                  $FILEPATH = NSBundle.mainBundle().pathForResource(..., ofType: "=~/plist/")
+                  ...
+                  $OBJ = NSDictionary(contentsOfFile: $FILEPATH)
+          - patterns:
+              # Find PLIST file reading
+              - pattern-inside: |
+                  $FILEPATH = Bundle.main.path(..., ofType: "=~/plist/")
+                  ...
+                  $OBJ = NSDictionary(contentsOfFile: $FILEPATH)
+          - patterns:
+              # Find PLIST file reading
+              - pattern-inside: |
+                  $FILEPATH = Bundle.main.path(..., ofType: "=~/plist/")
+                  ...
+                  $OBJ = FileManager.default.contents(atPath: $FILEPATH)
+          - patterns:
+              # Find PLIST file writing
+              - pattern-inside: |
+                  $FILEPATH = URL(fileURLWithPath: $X + ... + $TYPE)
+                  ...
+                  $RESULT = $OBJ.$WRITE(to: $FILEPATH, ...)
+              - metavariable-regex:
+                  metavariable: $TYPE
+                  regex: (?i)"([\s\S]*?)(plist)"
+              - metavariable-regex:
+                  metavariable: $WRITE
+                  regex: (?i)(write|writeToFile)
+          - patterns:
+              # Find PLIST file writing
+              - pattern-inside: |
+                  $FILENAME = $TYPE 
+                  ...
+                  $FILE = URL(fileURLWithPath: $X + ... + $FILENAME)
+                  ...
+                  $RESULT = $OBJ.$WRITE(to: $FILE, ...)
+              - metavariable-regex:
+                  metavariable: $TYPE
+                  regex: (?i)"([\s\S]*?)(plist)"
+              - metavariable-regex:
+                  metavariable: $WRITE
+                  regex: (?i)(write|writeToFile)
+          - patterns:
+              # Find PLIST file copy
+              - pattern-inside: |
+                  class $CLASS: $X {
+                    ...
+                    $FILEPATH = Bundle.main.resourcePath!.appending("=~/.*plist/")
+                    ...
+                    func $FUNC(){
+                      ...
+                      try FileManager.default.copyItem(atPath: $FILEPATH, toPath: $Y)
+                      ...
+                    }
+                    ...
+                  }
+              - pattern-inside: |
+                  class $CLASS: $X {
+                    ...
+                    $FILEPATH = Bundle.main.resourcePath!.appending("=~/.*plist/")
+                    ...
+                    func $FUNC(){
+                      ...
+                      try FileManager.default.copyItem(atPath: $Y, toPath: $FILEPATH)
+                      ...
+                    }
+                    ...
+                  }
+              - pattern-inside: |
+                  func $FUNC(){
+                    ...
+                    $FILEPATH = Bundle.main.resourcePath!.appending("=~/.*plist/")
+                    ...
+                    try FileManager.default.copyItem(atPath: $FILEPATH, toPath: $Y)
+                    ...
+                  }
+              - pattern-inside: |
+                  func $FUNC(){
+                    ...
+                    $FILEPATH = Bundle.main.resourcePath!.appending("=~/.*plist/")
+                    ...
+                    try FileManager.default.copyItem(atPath: $Y, toPath: $FILEPATH)
+                    ...
+                  }
