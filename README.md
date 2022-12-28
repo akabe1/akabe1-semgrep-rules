@@ -4,7 +4,7 @@ akabe1-semgrep-rules
 # Description 
 The akabe1-semgrep-rules are a collection of my custom Semgrep rules, built to speed-up activities like source code analysis.
 
-They provide various additional patterns useful to detect vulnerabilities, which could be used in combination with the official Semgrep rules in order to reduce the percentage of false negatives.
+They provide various additional patterns useful to detect vulnerabilities and security bad-practices, which could be used in combination with the official Semgrep rules in order to reduce the percentage of false negatives.
 
 
 # Usage
