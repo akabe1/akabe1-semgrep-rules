@@ -1,0 +1,90 @@
+rules:
+  - id: sqli_query
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://cwe.mitre.org/data/definitions/89.html
+        - https://owasp.org/www-community/attacks/SQL_Injection
+        - https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+      category: security
+    message: >-
+      This iOS mobile application could be vulnerable to SQL Injection, because the SQL queries
+      are built as string by concatenating code and untrusted input.
+      A successful SQL injection exploit can read sensitive data from the database, modify
+      database data (Insert/Update/Delete), execute administration operations on the database
+      (such as shutdown the DBMS), recover the content of a given file present on the DBMS
+      file system and in some cases issue commands to the operating system.
+      It is recommended to avoid to build SQL queries with string concatenation of code and
+      untrusted input, instead adopt prepared statements with parametrized queries protection
+      mechanisms. 
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $FUNC($X + ... + $Y + ...)
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ((?i)["']{1}[\.\s\(]*(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})[\s]*)
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+              - pattern-not-inside: |
+                  $W.$Z.println(...)
+              - pattern-not-inside: |
+                  println(...)
+          - patterns:
+              - pattern: $SQL = $X + $Y
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ((?i)["']{1}[\.\s\(]*(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})[\s]*)
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+              - pattern-not-inside: |
+                  $W.$Z.println(...)
+              - pattern-not-inside: |
+                  println(...)
+          - patterns:
+              - pattern: $SQL = $X + $Y + ...
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ((?i)["']{1}[\.\s\(]*(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})[\s]*)
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+              - pattern-not-inside: |
+                  $W.$Z.println(...)
+              - pattern-not-inside: |
+                  println(...)
+          - patterns:
+              - pattern: $SQL = $X + ... + $Y
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ((?i)["']{1}[\.\s\(]*(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})[\s]*)
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+              - pattern-not-inside: |
+                  $W.$Z.println(...)
+              - pattern-not-inside: |
+                  println(...)
+          - patterns:
+              - pattern: $SQL = $X + ... + $Y + ...
+              - metavariable-regex:
+                  metavariable: $X
+                  regex: ((?i)["']{1}[\.\s\(]*(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})[\s]*)
+              - metavariable-regex:
+                  metavariable: $Y
+                  regex: ^(?!")\w+
+              - pattern-not-inside: |
+                  $W.$Z.println(...)
+              - pattern-not-inside: |
+                  println(...)
+          - patterns:
+              # Trying to catch SQLi single string --> let query = "SELECT * FROM items WHERE owner='\(username)' AND itemname='\(item)'"
+              - pattern-inside: |
+                  let $SQL = $QUERY
+              - metavariable-regex:
+                  metavariable: $QUERY
+                  regex: (?i)"((ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})[\s]*)([\s\S]*?)(?='\\\(\w+\)')([\s\S]*?)"
