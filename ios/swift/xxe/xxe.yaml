@@ -1,0 +1,52 @@
+rules:
+  - id: xxe
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing
+        - https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+        - https://cwe.mitre.org/data/definitions/611.html
+        - https://developer.apple.com/documentation/foundation/nsxmlparser/1414143-shouldresolveexternalentities
+      category: security
+    message: >-
+      The iOS mobile application could be vulnerable to XXE attacks, because the resolution of XML
+      external entities in DTD is enabled on it. 
+      This kind of vulnerabilities may lead to the disclosure of confidential data, denial of service,
+      server side request forgery, port scanning, and other system impacts.
+      It is recommended to disable external entities following the OWASP prevention cheat sheet.
+      In particular, to disable XML resolution of external entities for the Swift XML parser SAXReader
+      it is recommended to avoid to set at True the option "shouldResolveExternalEntities" (which
+      is False by default).
+    languages: [swift]
+    patterns:
+      # By default the falg "shouldResolveExternalEntities" is false
+      - pattern-either:
+          - pattern-inside: |
+              $XMLPARSER = NSXMLParser(data: $OBJ.dataUsingEncoding($ENCODING)!)
+              ...
+              $XMLPARSER.shouldResolveExternalEntities = true
+              ...
+              $XMLPARSER.parse()
+          - pattern-inside: |
+              $XMLPARSER = NSXMLParser(data: $OBJ.dataUsingEncoding($ENCODING))
+              ...
+              $XMLPARSER.shouldResolveExternalEntities = true
+              ...
+              $XMLPARSER.parse()
+          - pattern-inside: |
+              var $RAWXMLDATA: NSData = $OBJ.data(using: $ENCODING)
+              ...
+              var $XMLPARSER: XMLParser = NSXMLParser(data: $RAWXMLDATA)
+              ...
+              $XMLPARSER.shouldResolveExternalEntities = true
+              ...
+              $XMLPARSER.parse()
+          - pattern-inside: |
+              func $FUNC() {
+                  ...
+                  $XMLPARSER.shouldResolveExternalEntities = true
+                  ...
+                  $XMLPARSER.parse()
+                  ...
+              }
