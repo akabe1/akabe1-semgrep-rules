@@ -1,0 +1,86 @@
+rules:
+- id: improper_cookie
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cwe.mitre.org/data/definitions/319.html
+      - https://cwe.mitre.org/data/definitions/1004.html
+      - https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/02-Testing_for_Cookies_Attributes
+    category: security
+  message: >-
+    This Java application seems not properly setting the security flags Secure and HttpOnly on
+    some cookies, if these cookies contain sensitive information (i.e. session cookies) the attributes
+    Secure and HttpOnly should be enabled.
+    The Secure flag ensures that the cookie is sent only over HTTPS, this avoid to pass the
+    cookie in unencrypted requests. The HttpOnly flag does not allow the cookie to be accessed via a
+    client-side script such as JavaScript, preventing session leakages. 
+    It is recommended to properly set the security flags on the session cookies of the web application.
+  languages: [java]
+  patterns:
+    - pattern-not-inside: |
+        $RET $METHOD(...) {
+         ...
+         $COOKIE.setSecure(true);
+         $COOKIE.setHttpOnly(true);
+         ...
+        }
+    - pattern-not-inside: |
+        $RET $METHOD(...) {
+         ...
+         $COOKIE.setHttpOnly(true);
+         $COOKIE.setSecure(true);
+         ...
+        }
+    - pattern-not-inside: $COOKIE.setValue("");
+    - pattern-not-inside: $COOKIE.setValue(null);
+    - pattern-not-inside: |
+        $RET $METHOD(...) {
+          ...
+          $COOKIE = ResponseCookie.from(...)
+            . ...
+            .httpOnly(true)
+            . ...
+            .secure(true)
+            . ...
+            ;
+          ...
+        }
+    - pattern-not-inside: |
+        $RET $METHOD(...) {
+          ...
+          $COOKIE = ResponseCookie.from(...)
+            . ...
+            .secure(true)
+            . ...
+            .httpOnly(true)
+            . ...
+            ;
+          ...
+        }
+    - pattern-either:
+        - patterns:
+            - pattern: $RESPONSE.setHeader("Set-Cookie", $ITEM);
+            - metavariable-regex:
+                metavariable: $ITEM
+                regex: (?i)(?!.*\bSecure\b)|(?!.*\bHttpOnly\b).*$
+        - patterns:
+            - pattern: $RESPONSE.addHeader("Set-Cookie", $ITEM);
+            - metavariable-regex:
+                metavariable: $ITEM
+                regex: (?i)(?!.*\bSecure\b)|(?!.*\bHttpOnly\b).*$
+        - patterns:
+            - pattern-either:
+                - pattern: $RESPONSE.addCookie($COOKIE);
+                #SpringBoot ResponseCookie
+                - pattern-inside: |
+                    $RET $METHOD(...) {
+                      ...
+                      $COOKIE = ResponseCookie.from(...)
+                        . ...
+                        ;
+                      ...
+                    }
+                #SpringBoot DefaultCookieSerializer by default has HttpOnly and Secure flags enabled
+                - pattern: $COOKIE.setUseHttpOnlyCookie(false);
+                - pattern: $COOKIE.setUseSecureCookie(false);
