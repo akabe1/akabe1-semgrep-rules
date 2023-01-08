@@ -1,0 +1,56 @@
+rules:
+- id: samesite_cookie
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cwe.mitre.org/data/definitions/1275.html
+      - https://owasp.org/www-community/SameSite
+    category: security
+  message: >-
+    This Java application seems having the attribute SameSite disabled on some cookies,
+    if these cookies contain sensitive information (i.e. session cookies) the flag SameSite should
+    not be configured to None value.
+    When the SameSite attribute is enabled (configured to Strict or Lax values), prevents the browser
+    from sending the cookie along with cross-site requests, then provides some mitigations against
+    CSRF attacks. It is recommended to properly set the security flag SameSite on the session cookies
+    of the web application.
+  languages: [java]
+  patterns:
+    - pattern-not-inside: $COOKIE.setValue("");
+    - pattern-not-inside: $COOKIE.setValue(null);
+    - pattern-not-inside: |
+        $RET $METHOD(...) {
+          ...
+          $COOKIE = ResponseCookie.from(...)
+            . ...
+            .sameSite("=~/(Strict|strict|Lax|lax)/")
+            . ...
+            ;
+          ...
+        }
+    - pattern-either:
+        - patterns:
+            - pattern: $RESPONSE.setHeader("Set-Cookie", $ITEM);
+            - metavariable-regex:
+                metavariable: $ITEM
+                regex: (?i).*(SameSite=none).*$
+        - patterns:
+            - pattern: $RESPONSE.addHeader("Set-Cookie", $ITEM);
+            - metavariable-regex:
+                metavariable: $ITEM
+                regex: (?i).*(SameSite=none).*$
+        - patterns:
+            - pattern-either:
+                - pattern: $RESPONSE.addCookie($COOKIE);
+                #SpringBoot ResponseCookie
+                - pattern-inside: |
+                    $RET $METHOD(...) {
+                      ...
+                      $COOKIE = ResponseCookie.from(...)
+                        . ...
+                        ;
+                      ...
+                    }
+                #SpringBoot DefaultCookieSerializer
+                - pattern: $COOKIE.setSameSite("=~/(None|none)/");
