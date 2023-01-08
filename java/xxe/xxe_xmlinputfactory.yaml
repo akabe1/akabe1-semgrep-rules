@@ -1,0 +1,104 @@
+rules:
+  - id: xxe_xmlinputfactory
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://cwe.mitre.org/data/definitions/611.html
+        - https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing
+        - https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+        - https://www.blackhat.com/docs/us-15/materials/us-15-Wang-FileCry-The-New-Age-Of-XXE-java-wp.pdf
+      category: security
+    message: >-
+      The web application could be vulnerable to XXE attacks, because the XML external entities
+      are enabled on it via XMLInputFactory. 
+      This kind of vulnerabilities may lead to the disclosure of confidential
+      data, denial of service, server side request forgery, port scanning, and other system impacts.
+      It is recommended to disable external entities following the OWASP prevention cheat sheet.
+      In particular for XMLInputFactory set the property "XMLInputFactory.SUPPORT_DTD" to FALSE
+      allows to disable DTDs entirely.
+      Alternatively, is possible to allow DOCTYPE declarations and only disable external entities
+      by setting to FALSE any of the properties "XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES",
+      or "javax.xml.stream.isSupportingExternalEntities".
+    languages: [java]
+    patterns:
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setProperty("javax.xml.stream.isSupportingExternalEntities", false);
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+            $XMLFACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            ...
+          }
+      - pattern-either:
+          - pattern: XMLInputFactory $XMLFACTORY = ... ;
