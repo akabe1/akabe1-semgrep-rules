@@ -2,7 +2,7 @@ akabe1-semgrep-rules
 ============================
 
 # Description 
-The akabe1-semgrep-rules are a collection of my custom Semgrep rules, built to speed-up activities like source code analysis.
+The akabe1-semgrep-rules are a collection of my custom Semgrep rules, built to speed-up activities like source code analysis (swift, java).
 
 They provide various additional patterns useful to detect vulnerabilities and security bad-practices, which could be used in combination with the official Semgrep rules in order to reduce the percentage of false negatives.
 
@@ -38,6 +38,14 @@ Below a non-exhaustive list of the rules included in this repo:
 * Insecure Storage issues
 * Keychain Settings issues
 * and others..
+
+
+**Java**
+
+* XXE
+* Improper Cookie issues
+
+
 
 # Note
 Currently the support of Swift language on Semgrep is in experimantal phase, this could cause false negatives.
