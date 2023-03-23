@@ -29,7 +29,7 @@ Below a non-exhaustive list of the rules included in this repo:
 
 * Certificate Pinning issues
 * Biometric Authentication issues
-* XXE
+* XXE issues
 * SQL Injection issues
 * Crypto issues
 * Log Injection issues
@@ -44,6 +44,7 @@ Below a non-exhaustive list of the rules included in this repo:
 
 * XXE
 * Improper Cookie issues
+* Crypto issues
 
 
 
