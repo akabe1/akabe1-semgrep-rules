@@ -1,0 +1,24 @@
+rules:
+- id: rsa_nopadding
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cwe.mitre.org/data/definitions/780.html
+      - https://cwe.mitre.org/data/definitions/327.html
+      - https://rdist.root.org/2009/10/06/why-rsa-encryption-padding-is-critical/
+    category: security
+  message: >-
+    This Java application uses a weak cipher, the encryption with a RSA public key without padding
+    exposes the encrypted data to several cryptographic attacks.
+    It is suggested to perform RSA encryption with OAEP padding (as "OAEPWithMD5AndMGF1Padding").
+  languages: [java]
+  patterns:
+    - pattern-either:
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE);
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
+    - metavariable-regex:
+        metavariable: $MODE
+        regex: RSA/.*/NoPadding

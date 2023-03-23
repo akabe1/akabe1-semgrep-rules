@@ -1,0 +1,25 @@
+rules:
+- id: none_ciphermode
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#cipher-modes
+      - https://cwe.mitre.org/data/definitions/327.html
+    category: security
+  message: >-
+    This Java application uses a weak cipher, because none cipher mode block is specified and
+    in that cases by default the deprecated ECB is used.
+    Data encrypted using EBC mode block results vulnerable to various cryptographic attacks,
+    which could allow to retrieve its plain-text value. 
+    It is recommended to not use ECB mode, avoiding to specify it either implicitly or explicitly.
+  languages: [java]
+  patterns:
+    - pattern-either:
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE);
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
+    - metavariable-regex:
+        metavariable: $MODE
+        regex: \"(AES|DES|3DES|DESede|Blowfish|IDEA|RC\d)\"

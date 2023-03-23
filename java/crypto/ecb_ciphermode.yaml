@@ -1,0 +1,26 @@
+rules:
+- id: ecb_ciphermode
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#cipher-modes
+      - https://cwe.mitre.org/data/definitions/327.html
+    category: security
+  message: >-
+    This Java application uses a weak cipher, the data encrypted using EBC mode block results vulnerable
+    to various cryptographic attacks, which could allow to retrieve its plain-text value (note that when
+    none mode is specified by default ECB is used). 
+    Note that RSA/ECB ciphers are not vulnerable and should be considered a false positive,
+    this is due to the fact that RSA is not a block cipher and this configuration corresponds to RSA/NONE.
+    It is recommended to avoid the use of ECB mode.
+  languages: [java]
+  patterns:
+    - pattern-either:
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE);
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
+    - metavariable-regex:
+        metavariable: $MODE
+        regex: .*/ECB/.*

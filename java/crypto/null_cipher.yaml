@@ -1,0 +1,23 @@
+rules:
+- id: null_cipher
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html
+      - https://cwe.mitre.org/data/definitions/327.html
+    category: security
+  message: >-
+    This Java application uses a weak cipher, the use of NULL cipher does not perform any
+    encryption, this does not offer any protection to the confidentiality of data. 
+    It is recommended to avoid the use of NULL cipher.
+  languages: [java]
+  patterns:
+    - pattern-either:
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE);
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
+    - metavariable-regex:
+        metavariable: $MODE
+        regex: (?i)\"null\"

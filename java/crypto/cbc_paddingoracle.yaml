@@ -1,0 +1,27 @@
+rules:
+- id: cbc_paddingoracle
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#cipher-modes
+      - https://cwe.mitre.org/data/definitions/327.html
+    category: security
+  message: >-
+    This Java application uses a weak cipher, the data encrypted using CBC mode block with PKCS5 and
+    PKCS7 paddings results vulnerable to Padding Oracle attack, which could allow to retrieve its
+    plain-text value.
+    It is suggested to switch from CBC mode to an authenticated encryption mode like GCM or
+    OCB; otherwise if CBC usage is required adopt cypertext authentication via MACs (like HMAC).
+  languages: [java]
+  patterns:
+    - pattern-either:
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE);
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
+    - metavariable-regex:
+        metavariable: $MODE
+        regex: .*/CBC/(PKCS5|PKCS7)Padding
+
+

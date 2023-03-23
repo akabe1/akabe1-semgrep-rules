@@ -1,0 +1,27 @@
+rules:
+- id: nointegrity_ciphermode
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#cipher-modes
+      - https://cwe.mitre.org/data/definitions/327.html
+    category: security
+  message: >-
+    This Java application uses a weak cipher that does not guarantee integrity protection. 
+    The data encrypted using ciphers like CBC, OFB, CTR or ECB mode block, is susceptible to
+    alteration by an attacker, because these cipher modes do not provide a way to
+    detect if data is tampered.
+    It is suggested to use a cipher that includes a HMAC to sign the data.
+  languages: [java]
+  patterns:
+    - pattern-either:
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE);
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
+    - metavariable-regex:
+        metavariable: $MODE
+        regex: .*/(CBC|OFB|ECB|CTR)/.*
+
+
