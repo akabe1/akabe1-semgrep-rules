@@ -1,0 +1,23 @@
+rules:
+- id: blowfish_cipher
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#algorithms
+      - https://cwe.mitre.org/data/definitions/327.html
+    category: security
+  message: >-
+    This Java application uses a weak cipher, the data encrypted using Blowfish cipher results vulnerable
+    to various cryptographic attacks, which could allow to retrieve its plain-text value. 
+    It is recommended to avoid the use of Blowfish cipher.
+  languages: [java]
+  patterns:
+    - pattern-either:
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE);
+      - pattern: |
+          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
+    - metavariable-regex:
+        metavariable: $MODE
+        regex: Blowfish/.*/.*
