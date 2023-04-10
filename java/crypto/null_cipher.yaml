@@ -13,11 +13,7 @@ rules:
     It is recommended to avoid the use of NULL cipher.
   languages: [java]
   patterns:
-    - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: (?i)\"null\"
+    - pattern: |
+        Cipher $VAR = Cipher.getInstance("=~/null/i", ...);
+    - pattern: |
+        $NC = NullCipher();

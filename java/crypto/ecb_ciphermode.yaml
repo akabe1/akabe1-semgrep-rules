@@ -16,11 +16,6 @@ rules:
     It is recommended to avoid the use of ECB mode.
   languages: [java]
   patterns:
-    - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: .*/ECB/.*
+    - pattern: |
+        Cipher $VAR = Cipher.getInstance("=~/.*\/ECB\/.*/", ...);
+

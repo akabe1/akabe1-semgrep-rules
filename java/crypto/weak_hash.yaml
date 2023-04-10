@@ -1,0 +1,45 @@
+rules:
+- id: weak_hash
+  severity: WARNING
+  metadata:
+    author: Maurizio Siddu
+    references:
+      - https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption
+      - https://cwe.mitre.org/data/definitions/328.html
+    category: security
+  message: >-
+    This Java application uses a weak hashing algorithm, these hashed values result 
+    vulnerable to various cryptographic attacks, which could allow to retrieve
+    its plain-text value. 
+    It is recommended to avoid the use of weak hashing algorithms.
+  languages: [java]
+  patterns:
+    - pattern-either:
+        - pattern: |
+            MessageDigest $MD = MessageDigest.getInstance("=~/MD\d/i", ...);
+        - pattern: |
+            MessageDigest $MD = MessageDigest.getInstance("=~/SHA1/i", ...);
+        - pattern: |
+            MessageDigest $MD = getDigest(...);
+        - pattern: |
+            MessageDigest $MD = getMd2Digest(...);
+        - pattern: |
+            MessageDigest $MD = getMd4Digest(...);
+        - pattern: |
+            MessageDigest $MD = getMd5Digest(...);
+        - pattern: |
+            MessageDigest $MD = getMd6Digest(...);
+        - pattern: |
+            MessageDigest $MD = getSha1Digest(...);
+        - pattern: |
+            getDigest(...).digest(...);
+        - pattern: |
+            getMd2Digest(...).digest(...);
+        - pattern: |
+            getMd4Digest(...).digest(...);
+        - pattern: |
+            getMd5Digest(...).digest(...);
+        - pattern: |
+            getMd6Digest(...).digest(...);
+        - pattern: |
+            getSha1Digest(...).digest(...);

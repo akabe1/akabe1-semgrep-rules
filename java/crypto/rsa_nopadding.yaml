@@ -14,11 +14,5 @@ rules:
     It is suggested to perform RSA encryption with OAEP padding (as "OAEPWithMD5AndMGF1Padding").
   languages: [java]
   patterns:
-    - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: RSA/.*/NoPadding
+    - pattern: |
+        Cipher $VAR = Cipher.getInstance("=~/RSA\/.*\/NoPadding/i", ...);

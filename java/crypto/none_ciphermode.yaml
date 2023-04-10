@@ -15,11 +15,5 @@ rules:
     It is recommended to not use ECB mode, avoiding to specify it either implicitly or explicitly.
   languages: [java]
   patterns:
-    - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: \"(AES|DES|3DES|DESede|Blowfish|IDEA|RC\d)\"
+    - pattern: |
+        Cipher $VAR = Cipher.getInstance("=~/(AES|DES|3DES|DESede|DESEDEWRAP|Blowfish|IDEA|RC\d|ARCFOUR|ARC\d)$/i", ...);

@@ -15,13 +15,5 @@ rules:
     It is suggested to use a cipher that includes a HMAC to sign the data.
   languages: [java]
   patterns:
-    - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: .*/(CBC|OFB|ECB|CTR)/.*
-
-
+    - pattern: |
+        Cipher $VAR = Cipher.getInstance("=~/.*\/(CBC|OFB|ECB|CTR)\/.*/", ...);

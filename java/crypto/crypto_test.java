@@ -33,6 +33,34 @@ public class VulnClass {
   }
 
 
+  
+  
+  protected Cipher BadCrypto3() {
+    Cipher cipher = Cipher.getInstance("DESede");
+    cipher.init(mode, (Key)key);
+    return cipher;
+  }
+  
+  
+  protected void BadCrypto4(String key) {
+    DESKeySpec dks = new DESKeySpec(key.getBytes());
+    SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+    Key secretKey = keyFactory.generateSecret(dks);
+  }
+
+
+
+  protected void BadHash1() {  
+    MessageDigest sr = MessageDigest.getInstance("MD5");
+    String str = sr.toString();
+    System.out.println("Status : " + str);
+  }
+  
+  
+  protected void BadHash2(byte[] data) {  
+    return getMd2Digest().digest(data);
+  }
+
 
 }
 

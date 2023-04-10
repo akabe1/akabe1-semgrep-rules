@@ -13,11 +13,5 @@ rules:
     It is recommended to avoid the use of Blowfish cipher.
   languages: [java]
   patterns:
-    - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: Blowfish/.*/.*
+    - pattern: |
+        Cipher $VAR = Cipher.getInstance("=~/(Blowfish\/.*\/.*|Blowfish)/", ...);

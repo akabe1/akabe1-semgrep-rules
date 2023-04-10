@@ -15,13 +15,7 @@ rules:
     OCB; otherwise if CBC usage is required adopt cypertext authentication via MACs (like HMAC).
   languages: [java]
   patterns:
-    - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: .*/CBC/(PKCS5|PKCS7)Padding
+    - pattern: |
+        Cipher $VAR = Cipher.getInstance("=~/.*\/CBC\/(PKCS5|PKCS7)Padding/i", ...);
 
 

@@ -14,10 +14,7 @@ rules:
   languages: [java]
   patterns:
     - pattern-either:
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE);
-      - pattern: |
-          Cipher $VAR = $CIPHER.getInstance($MODE, ...);
-    - metavariable-regex:
-        metavariable: $MODE
-        regex: (3DES|DESede)/.*/.*
+        - pattern: |
+            Cipher $VAR = Cipher.getInstance("=~/((3DES|DESede|DESEDEWRAP)\/.*\/.*|(3DES|DESede|DESEDEWRAP))/i", ...);
+        - pattern: |
+            SecretKeyFactory $VAR = SecretKeyFactory.getInstance("=~/((3DES|DESede|DESEDEWRAP)\/.*\/.*|(3DES|DESede|DESEDEWRAP))/i", ...);
