@@ -6,13 +6,16 @@ rules:
     references:
       - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html#cipher-modes
       - https://cwe.mitre.org/data/definitions/327.html
+      - https://docs.oracle.com/javase/9/security/java-cryptography-architecture-jca-reference-guide.htm#JSSEC-GUID-DE597505-1B42-4AE3-AE2D-45F9123138FA
     category: security
   message: >-
-    This Java application uses a weak cipher, because none cipher mode block is specified and
-    in that cases by default the deprecated ECB is used.
+    This Java application does not specifies a cipher mode block when instatiating a new cipher. 
+    This means that implicitly is adopted a cipher-provider specific cipher mode, which for 
+    the majority of the Java cipher-provider is the deprecated ECB mode.
     Data encrypted using EBC mode block results vulnerable to various cryptographic attacks,
     which could allow to retrieve its plain-text value. 
-    It is recommended to not use ECB mode, avoiding to specify it either implicitly or explicitly.
+    It is recommended to use transformations that fully specify not weak values for the algorithm, 
+    mode, and padding instead of relying on the defaults.
   languages: [java]
   patterns:
     - pattern: |
