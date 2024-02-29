@@ -16,8 +16,8 @@ rules:
       server side request forgery, port scanning, and other system impacts.
       It is recommended to disable external entities following the OWASP prevention cheat sheet.
       In particular, to disable XML resolution of external entities for the Swift XML parser SAXReader
-      it is recommended to avoid to set at True the option "shouldResolveExternalEntities" (which
-      is False by default).
+      it is recommended to avoid to set to TRUE the "shouldResolveExternalEntities" option (by default
+      is FALSE).
     languages: [swift]
     patterns:
       # By default the falg "shouldResolveExternalEntities" is false
@@ -50,3 +50,4 @@ rules:
                   $XMLPARSER.parse()
                   ...
               }
+
