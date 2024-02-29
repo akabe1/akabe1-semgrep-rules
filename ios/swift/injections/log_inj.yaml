@@ -36,7 +36,6 @@ rules:
               - metavariable-regex:
                   metavariable: $TEXTFIELD
                   regex: (?i)(.*?)(?=TextField)([!]?)
-
           - patterns:
               - pattern-inside: |
                   class $CLASS: $X {
@@ -45,9 +44,9 @@ rules:
                       ...
                       func $FUNC() {
                         ...
-                        let $VALUE = $INPUT.text
+                        $VALUE = $INPUT.text
                         ...
-                        NSLog("=~/.*(%@).*/", $INPUT.text)
+                        NSLog("=~/.*(%@).*/", $VALUE)
                         ...
                       }
                       ...
@@ -55,7 +54,41 @@ rules:
               - metavariable-regex:
                   metavariable: $TEXTFIELD
                   regex: (?i)(.*?)(?=TextField)([!]?)
-        #Unvalidated input from WebView
+          - patterns: 
+              - pattern-inside: |
+                  class $CLASS: $X {
+                      ...
+                      var $INPUT: $TEXTFIELD
+                      ...
+                      func $FUNC() {
+                          ...
+                          NSLog("=~/.*(%@).*/", $INPUT.stringValue)
+                          ...
+                      }
+                      ...
+                  }
+              - metavariable-regex:
+                  metavariable: $TEXTFIELD
+                  regex: (?i)(.*?)(?=TextField)([!]?)
+          - patterns:
+              - pattern-inside: |
+                  class $CLASS: $X {
+                      ...
+                      var $INPUT: $TEXTFIELD
+                      ...
+                      func $FUNC() {
+                        ...
+                        $VALUE = $INPUT.stringValue
+                        ...
+                        NSLog("=~/.*(%@).*/", $VALUE)
+                        ...
+                      }
+                      ...
+                  }
+              - metavariable-regex:
+                  metavariable: $TEXTFIELD
+                  regex: (?i)(.*?)(?=TextField)([!]?)
+          #Unvalidated input from WebView
           - patterns:
               - pattern-inside: |
                   $INPUT = $WEBVIEW.stringByEvaluatingJavaScript(...).$READ
@@ -168,4 +201,27 @@ rules:
                   NSLog("=~/.*(%@).*/", $COMP.$ITEM)
               - metavariable-regex:
                   metavariable: $ITEM
-                  regex: (?i)(host|scheme|query|percentEncodedQuery|fragmqnt|password|path|port|user)                  
+                  regex: (?i)(host|scheme|query|percentEncodedQuery|fragmqnt|password|path|port|user)
+          - patterns:
+              - pattern-inside: |
+                    $ITEMS = $COMP.queryItems 
+                    ...
+                    for $ITEM in $ITEMS {
+                      ...
+                      NSLog("=~/.*(%@).*/", $ITEM.$FIELD)
+                      ...
+                    }
+          #rimuovere                
+          #- patterns:
+          #    - pattern-inside: |
+          #        $INPUT = navigationAction.request.url?.absoluteString
+          #        ...
+          #        $COMP = URLComponents(...)
+          #        ...
+          #        $ITEM = components.queryItems 
+          #        ...
+          #        NSLog($LOG, $ITEM.$FIELD)
+          #        NSLog("=~/.*(%@).*/", $ITEM.$FIELD)
+          #    - metavariable-regex:
+          #        metavariable: $LOG
+          #        regex: ([\s\S]*?)(?=%@)([\s\S]*?)
