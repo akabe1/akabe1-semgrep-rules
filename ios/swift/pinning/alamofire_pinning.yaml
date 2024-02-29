@@ -54,12 +54,16 @@ rules:
                       let $EVALUATORS = [$X: DefaultTrustEvaluator(..., validateHost: false, ...)]
                   - pattern: |
                       let $EVALUATORS = [$X: DefaultTrustEvaluator(..., acceptSelfSignedCertificates: true, ...)]
+                  - pattern: |
+                      let $EVALUATORS = [$X: DefaultTrustEvaluator(..., performDefaultValidation: false, ...)]
           - patterns:
               - pattern-either:
                   - pattern: |
                       let $EVALUATORS = [$X: PublicKeysTrustEvaluator(..., validateHost: false, ...)]
                   - pattern: |
                       let $EVALUATORS = [$X: PublicKeysTrustEvaluator(..., acceptSelfSignedCertificates: true, ...)]
+                  - pattern: |
+                      let $EVALUATORS = [$X: PublicKeysTrustEvaluator(..., performDefaultValidation: false, ...)]
           - patterns:
               - pattern-inside: |
                   let $SERVERTRUSTPOLICIES = $EVALUATOR(..., validateHost: false, ...)
@@ -72,4 +76,9 @@ rules:
               - metavariable-regex:
                   metavariable: $EVALUATOR
                   regex: (?i)(PinnedCertificatesTrustEvaluator|PublicKeysTrustEvaluator)
-          
+          - patterns:
+              - pattern-inside: |
+                  let $SERVERTRUSTPOLICIES = $EVALUATOR(..., performDefaultValidation: false, ...)
+              - metavariable-regex:
+                  metavariable: $EVALUATOR
+                  regex: (?i)(PinnedCertificatesTrustEvaluator|PublicKeysTrustEvaluator)
