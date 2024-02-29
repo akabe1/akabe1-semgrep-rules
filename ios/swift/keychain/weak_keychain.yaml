@@ -7,17 +7,17 @@ rules:
         - https://mas.owasp.org/MASTG/iOS/0x06d-Testing-Data-Storage/
         - https://developer.apple.com/documentation/security/keychain_services
         - https://support.apple.com/guide/security/keychain-data-protection-secb0694df1a/web
+        - https://developer.apple.com/documentation/security/keychain_services/keychain_items/restricting_keychain_item_accessibility
       category: security
     message: >-
       This iOS mobile application seems configured with a weak Keychain protection, because
-      configured with the deprecated Keychian attributes "kSecAttrAccessibleAlways" or 
+      presents the deprecated Keychian attribute "kSecAttrAccessibleAlways" or 
       "kSecAttrAccessibleAlwaysThisDeviceOnly". These weak Keychain protection attributes could
       allow an attacker to access the data stored in the corresponding Keychain item, regardless of
       whether the device is locked.
       It is recommended to use an adequate protection level for Keychain data possibly having the
       "ThisDeviceOnly" suffix, related with the level of confidentiality required for the stored data. 
-      Note that by default the kSecAttrAccessible flag for Keychain is set
-      to "kSecAttrAccessibleWhenUnlocked".
+      Note that by default the kSecAttrAccessible flag for iOS Keychain is set to "kSecAttrAccessibleWhenUnlocked".
     languages: [swift]
     patterns:
       - pattern-either:

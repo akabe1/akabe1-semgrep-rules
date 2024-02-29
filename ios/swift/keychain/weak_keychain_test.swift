@@ -6,7 +6,7 @@ import example
 class keychainController: keychainViewController {
 
     func foo1() {
-        // good keychain (default kSecAttrAccessible is kSecAttrAccessibleWhenUnlocked)
+        // ok: good keychain (default kSecAttrAccessible is kSecAttrAccessibleWhenUnlocked)
         let keychainItemQuery = [
             kSecValueData: "test123".data(using: .utf8)!,
             kSecClass: kSecClassGenericPassword
@@ -19,37 +19,37 @@ class keychainController: keychainViewController {
 
     
     func foo2() {
-        // vuln keychain (weak protection)
         let token = "secret"
         var query = [String : AnyObject]()
         query[kSecClass as String] = kSecClassGenericPassword
         query[kSecValueData as String] = token as AnyObject?
+        // ruleid: vuln keychain (weak protection)
         query[kSecAttrAccessible as String] = kSecAttrAccessibleAlwaysThisDeviceOnly
         SecItemAdd(query as CFDictionary, nil)
     }
     
     
+    
     func foo3() {
-        // vuln keychain (weak protection)
         let token = "secret"
         var query = [String : AnyObject]()
         query[kSecClass as String] = kSecClassGenericPassword
         query[kSecValueData as String] = token as AnyObject?
+        // ruleid: vuln keychain (weak protection)
         query[kSecAttrAccessible as String] = kSecAttrAccessibleAlways
         SecItemAdd(query as CFDictionary, nil)
     }
     
     
     
-    
     func foo4() {
-        // good keychain
+        // ok: good keychain
         let keychainItemQuery = [
             kSecValueData: "test123".data(using: .utf8)!,
             kSecClass: kSecClassGenericPassword,
             kSecAttrAccessible: kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
         ] as CFDictionary
-
+        
         let status = SecItemAdd(keychainItemQuery, nil)
         print("Operation finished with status: \(status)")
     }
@@ -57,7 +57,7 @@ class keychainController: keychainViewController {
    
     
     func foo5() {
-        // vuln keychain 
+        // ruleid: vuln keychain (weak protection)
         var query: [String: Any] = [kSecClass as String: kSecClassInternetPassword,
                                     kSecAttrAccount as String: account,
                                     kSecAttrServer as String: server,
@@ -67,8 +67,9 @@ class keychainController: keychainViewController {
     }
     
     
+    
     func foo6() {
-        // vuln keychain
+        // ruleid: vuln keychain (weak protection)
         let keychainItemQuery = [
             kSecValueData: "test123".data(using: .utf8)!,
             kSecClass: kSecClassGenericPassword,
@@ -80,14 +81,14 @@ class keychainController: keychainViewController {
     }
     
     
+    
     func foo7(_ data: Data, forKey key: String) {
-        // good keychain
         let query: [NSString: Any] = [
             kSecClass: secClass,
             kSecAttrAccount: key,
             kSecAttrAccessGroup: accessGroup
         ]
-        
+        // ok: good keychain
         let attributes: [NSString: Any] = [
             kSecValueData: data,
             kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly

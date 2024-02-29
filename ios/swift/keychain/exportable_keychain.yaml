@@ -16,6 +16,8 @@ rules:
       When storing sensitive data it is recommended to use an high protection level for Keychain data having
       the "ThisDeviceOnly" suffix. Note that by default the kSecAttrAccessible flag for Keychain is set
       to "kSecAttrAccessibleWhenUnlocked".
+      NOTE: this rule does not find the cases of kSecAttrAccessible not explicitly set, by default the 
+      "kSecAttrAccessible" value is set to "kSecAttrAccessibleWhenUnlocked".
     languages: [swift]
     patterns:
       - pattern-either:
@@ -24,40 +26,40 @@ rules:
                   $QUERY[kSecAttrAccessible as String] = $KEYCHAINPROTECTION
               - metavariable-regex:
                   metavariable: $KEYCHAINPROTECTION
-                  regex: (?i)(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock)
+                  regex: (?i)(\bkSecAttrAccessibleWhenUnlocked\b|\bkSecAttrAccessibleAlways\b|\bkSecAttrAccessibleAfterFirstUnlock\b)
           - patterns:
               - pattern-inside: |
                   $QUERY[kSecAttrAccessible] = $KEYCHAINPROTECTION
               - metavariable-regex:
                   metavariable: $KEYCHAINPROTECTION
-                  regex: (?i)(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock)
+                  regex: (?i)(\bkSecAttrAccessibleWhenUnlocked\b|\bkSecAttrAccessibleAlways\b|\bkSecAttrAccessibleAfterFirstUnlock\b)
           - patterns:
               - pattern-inside: |
                   $QUERY = $VALUE as CFDictionary
               - metavariable-regex:
                   metavariable: $VALUE
-                  regex: (?i)([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)
+                  regex: (?i)([\s\S]*?)(?=(\bkSecAttrAccessibleWhenUnlocked\b|\bkSecAttrAccessibleAlways\b|\bkSecAttrAccessibleAfterFirstUnlock\b))([\s\S]*?)
           - patterns:
               - pattern-inside: |
                   var $QUERY: [String: Any] = $VALUE
               - metavariable-regex:
                   metavariable: $VALUE
-                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
+                  regex: (?i)\[([\s\S]*?)(?=(\bkSecAttrAccessibleWhenUnlocked\b|\bkSecAttrAccessibleAlways\b|\bkSecAttrAccessibleAfterFirstUnlock\b))([\s\S]*?)\]
           - patterns:
               - pattern-inside: |
                   let $QUERY: [String: Any] = $VALUE
               - metavariable-regex:
                   metavariable: $VALUE
-                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
+                  regex: (?i)\[([\s\S]*?)(?=(\bkSecAttrAccessibleWhenUnlocked\b|\bkSecAttrAccessibleAlways\b|\bkSecAttrAccessibleAfterFirstUnlock\b))([\s\S]*?)\]
           - patterns:
               - pattern-inside: |
                   var $QUERY: [NSString: Any] = $VALUE
               - metavariable-regex:
                   metavariable: $VALUE
-                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
+                  regex: (?i)\[([\s\S]*?)(?=(\bkSecAttrAccessibleWhenUnlocked\b|\bkSecAttrAccessibleAlways\b|\bkSecAttrAccessibleAfterFirstUnlock\b))([\s\S]*?)\]
           - patterns:
               - pattern-inside: |
                   let $QUERY: [NSString: Any] = $VALUE
               - metavariable-regex:
                   metavariable: $VALUE
-                  regex: (?i)\[([\s\S]*?)(?=(kSecAttrAccessibleWhenUnlocked|kSecAttrAccessibleAlways|kSecAttrAccessibleAfterFirstUnlock))([\s\S]*?)\]
+                  regex: (?i)\[([\s\S]*?)(?=(\bkSecAttrAccessibleWhenUnlocked\b|\bkSecAttrAccessibleAlways\b|\bkSecAttrAccessibleAfterFirstUnlock\b))([\s\S]*?)\]
