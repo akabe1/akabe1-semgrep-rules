@@ -88,3 +88,4 @@ rules:
               - metavariable-regex:
                   metavariable: $QUERY
                   regex: (?i)"((ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})[\s]*)([\s\S]*?)(?='\\\(\w+\)')([\s\S]*?)"
+
