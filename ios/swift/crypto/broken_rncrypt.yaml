@@ -1,0 +1,339 @@
+rules:
+  - id: broken_crypto_rncrypt
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06e-Testing-Cryptography/
+        - https://support.apple.com/en-ca/guide/security/sece3bee0835/web
+        - https://developer.apple.com/library/archive/documentation/Security/Conceptual/cryptoservices/GeneralPurposeCrypto/GeneralPurposeCrypto.html
+        - https://cwe.mitre.org/data/definitions/327.html
+        - https://cwe.mitre.org/data/definitions/330.html
+        - https://cwe.mitre.org/data/definitions/338.html
+      category: security
+    message: >-
+      This iOS mobile application seems performing an insecure use of cryptography, because the
+      implemented cryptographic process presents some security flaws. In detail, it was detected
+      the usage of a RNCrypt/Arcane/SwiftyRSA cryptographic feature having some critical parameter (crypto
+      key, IV, keygen passphrase, etc.) set insecurely (static, hardcoded, null or empty).  
+      An attacker could exploit this issue in order to retrieve the original value of the encrypted
+      data.
+      It is recommended to adopt only cryptographic features and algorithms offered by the iOS platform
+      that are internationally recognized as strong. It is also fundamental to ensure that the
+      encryption parameters (crypto key, IV, etc.) are generate randomly using a cryptographically
+      strong PRNG function (as the Apple method "SecRandomCopyBytes").
+      In addition, if it is needed to store an encryption parameter on device, a secure storage mechanism
+      like the iOS KeyChain must be used.
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          #RNCrypt, Arcane and SwiftyRSA
+          - patterns:
+              - pattern-inside: |
+                  $DATA = $OBJ.$CRYPTO(..., $PSW: $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $DATA = try $OBJ.$CRYPTO(..., $PSW: $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $DATA = $OBJ.$CRYPTO(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $DATA = try $OBJ.$CRYPTO(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $PSW: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $PSW: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $PSW: $KEY.$X(...), ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $PSW: $KEY.$X(...), ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $KEY.$X(...), ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $KEY.$X(...), ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $PSW: $KEY.$X(...)!, ...)!
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $PSW: $KEY.$X(...)!, ...)!
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword|with|(.*?)key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $KEY.$X(...)!, ...)!
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $KEY.$X(...)!, ...)!
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|encryptData|decryptData|Encryptor|Decryptor|encrypted|decrypted)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          #RNCrypt specific
+          - patterns:
+              - pattern-inside: |
+                  $DATA = try $OBJ.$CRYPTO(..., $PSW: $VALUE, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))      
+          - patterns:
+              - pattern-inside: |
+                  $DATA = $OBJ.$CRYPTO(..., $PSW: $VALUE, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $DATA = try $OBJ.$CRYPTO(..., $VALUE, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))      
+          - patterns:
+              - pattern-inside: |
+                  $DATA = $OBJ.$CRYPTO(..., $VALUE, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $PSW: $KEY, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $PSW: $KEY, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $PSW
+                  regex: (?i)(password|withPassword)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\(\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = try $OBJ.$CRYPTO(..., $KEY, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $DATA = $OBJ.$CRYPTO(..., $KEY, ...).$METHOD(...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(Encryptor|Decryptor)
+              - metavariable-regex:
+                  metavariable: $METHOD
+                  regex: (encrypt|decrypt|encryptData|decryptData)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\(\))          

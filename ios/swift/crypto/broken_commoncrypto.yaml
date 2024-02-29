@@ -1,0 +1,92 @@
+rules:
+  - id: broken_commoncrypto
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      references:
+        - https://mas.owasp.org/MASTG/iOS/0x06e-Testing-Cryptography/
+        - https://support.apple.com/en-ca/guide/security/sece3bee0835/web
+        - https://developer.apple.com/library/archive/documentation/Security/Conceptual/cryptoservices/GeneralPurposeCrypto/GeneralPurposeCrypto.html
+        - https://cwe.mitre.org/data/definitions/327.html
+        - https://cwe.mitre.org/data/definitions/330.html
+        - https://cwe.mitre.org/data/definitions/338.html
+      category: security
+    message: >-
+      This iOS mobile application seems performing an insecure use of cryptography, because the
+      implemented cryptographic process presents some security flaws. In detail, it was detected
+      the usage of a CommonCrypto cryptographic feature having some critical parameter (crypto
+      key, IV, keygen passphrase, etc.) set insecurely (static, hardcoded, null or empty).
+      An attacker could exploit this issue in order to retrieve the original value of the encrypted
+      data.
+      It is recommended to adopt only cryptographic features and algorithms offered by the iOS platform
+      that are internationally recognized as strong. It is also fundamental to ensure that the
+      encryption parameters (crypto key, IV, etc.) are generate randomly using a cryptographically
+      strong PRNG function (as the Apple method "SecRandomCopyBytes").
+      In addition, if it is needed to store an encryption parameter on device, a secure storage mechanism
+      like the iOS KeyChain must be used.
+    languages: [swift]
+    patterns:
+      - pattern-either:
+          #CommonCrypto and Apple-Swift-Crypto
+          - patterns:
+              - pattern-inside: |
+                  $CRYPTO(..., $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(CCKeyDerivationPBKDF|deriveKey|CCHmac|CCCrypt) 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $CRYPTO(..., $X: $VALUE, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(CCKeyDerivationPBKDF|deriveKey|CCHmac|CCCrypt) 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(CCKeyDerivationPBKDF|deriveKey|CCHmac|CCCrypt) 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $CRYPTO(..., $X: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(CCKeyDerivationPBKDF|deriveKey|CCHmac|CCCrypt) 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $CRYPTO(..., Array($KEY), ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(CCKeyDerivationPBKDF|deriveKey|CCHmac|CCCrypt) 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $CRYPTO(..., $X: Array($KEY), ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(CCKeyDerivationPBKDF|deriveKey|CCHmac|CCCrypt) 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
