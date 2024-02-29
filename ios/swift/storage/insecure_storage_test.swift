@@ -1,5 +1,10 @@
 import example
 
+// ruleid: vuln hardcoded secret
+fileprivate let aesKey = "superSecretKey"
+// ruleid: vuln hardcoded secret
+fileprivate let iv = "superSecretIV"
+
 
 class StorageViewController: UIViewController {
 
@@ -9,7 +14,7 @@ class StorageViewController: UIViewController {
             imageView.contentMode = .ScaleAspectFit
             imageView.image = pickedImage
         }
-        // vuln cleartext storage via UIImageWriteToSavedPhotosAlbum
+        // ruleid: vuln cleartext storage via UIImageWriteToSavedPhotosAlbum
         UIImageWriteToSavedPhotosAlbum(pickedImage!, self, nil, nil)
         dismissViewControllerAnimated(true, completion: nil)
     }
@@ -17,7 +22,7 @@ class StorageViewController: UIViewController {
      
     func foo2() {
         let plistName = "secretfile.plist"
-        // maybe vuln cleartext storage
+        // ruleid: potential vuln cleartext storage
         let filePath = URL(fileURLWithPath: Bundle.main.resourcePath! + "/" + plistName)
         let encodedData = try PropertyListEncoder().encode(self)
         let succeed = encodedData.write(to: filePath)
@@ -27,7 +32,7 @@ class StorageViewController: UIViewController {
      
     func foo3() {
         var myDict: NSDictionary?
-        // maybe vuln cleartext storage
+        // ruleid: potential vuln cleartext storage
         let path = NSBundle.mainBundle().pathForResource("Config", ofType: "plist") 
         myDict = NSDictionary(contentsOfFile: path)
     }
@@ -35,7 +40,7 @@ class StorageViewController: UIViewController {
   
   
     func foo4() {
-        // vuln cleartext storage NSUserDefaults
+        // ruleid: vuln cleartext storage NSUserDefaults
         var test = "secret_test"
         UserDefaults.standard.set(test, forKey: "PIN")
     }

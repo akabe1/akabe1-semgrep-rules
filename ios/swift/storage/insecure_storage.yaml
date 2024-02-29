@@ -37,14 +37,14 @@ rules:
                   UserDefaults.standard.set($VALUE, forKey: $KEY)
               - metavariable-regex:
                   metavariable: $KEY
-                  regex: (?i)(.*?)(?=(secret|password|pwd|psw|credit|card|cvv|key|crypto|pin))(.*?)
+                  regex: (?i)(.*?)(?=(secret|password|pwd|psw|credit|card|cvv|key|crypto|pin|token))(.*?)
           - patterns:
               # Find NSUserDefaults (old version) which does not encrypt data
               - pattern: |
                   NSUserDefaults.standardUserDefaults().setObject($VALUE, forKey: $KEY)
               - metavariable-regex:
                   metavariable: $KEY
-                  regex: (?i)(.*?)(?=(secret|password|pwd|psw|credit|card|cvv|key|crypto|pin))(.*?)
+                  regex: (?i)(.*?)(?=(secret|password|pwd|psw|credit|card|cvv|key|crypto|pin|token))(.*?)
           - patterns:
               # Find PLIST file reading 
               - pattern-inside: |
