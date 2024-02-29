@@ -13,12 +13,10 @@ rules:
         - WKWebView has JavaScript support not explicitly disabled (enabled by default)
         - WKWebView has enabled JavaScript to access content from other "file://" scheme URLs (allowFileAccessFromFileURLs default false)
         - WKWebView has enabled JavaScript to access content from any origin (allowUniversalAccessFromFileURLs default false)
-        - WKWebView is using a JavaScript to Native bridge which could potentially expose sensitive data (WKScriptMessageHandler)
       This configuration of WKWebView increases the attack surface of the mobile app and could lead to various
       kind of vulnearbilities (i.e. reflected XSS, code injection, information disclosure, etc.).
-      If possible it is recommended to configure WKWebView in the mobile app with JavaScript disabled, also
-      avoiding to expose sensitive data via JavaScript to Native bridge, and disabling the permission to access content from
-      any origin or other file scheme URLs.
+      If possible it is recommended to configure WKWebView in the mobile app with JavaScript disabled, and disabling 
+      the permission to access content from any origin or other file scheme URLs.
     languages: [swift]
     patterns:
       - pattern-either:
@@ -120,7 +118,7 @@ rules:
               - pattern-not-inside: |
                   func $FUNC() {
                     ...
-                    $WEBVIEW.configuration.defaultWebpagePreferences.allowsContentJavaScript = false 
+                    $WEBVIEW.configuration.defaultWebpagePreferences.allowsContentJavaScript = false
                     ...
                   }
           - patterns:       
@@ -168,7 +166,3 @@ rules:
                       $WEBVIEW.configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
                   - pattern: |
                       $WEBVIEW.configuration.preferences.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
-          - patterns:
-              # JavaScript to Native bridge bad practice
-              - pattern: |
-                  message.$WEBVIEW?.evaluateJavaScript(...)

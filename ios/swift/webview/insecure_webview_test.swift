@@ -6,7 +6,7 @@ import SafariServices
 // Check UIWebView 
 class UIViewController: UIViewController {
 
-    // vuln UIWebView
+    // ruleid: vuln UIWebView
     @IBOutlet weak var webView: UIWebView!
     
     override func viewDidLoad() {
@@ -29,8 +29,8 @@ class UIViewController: UIViewController {
 
 class UIWebViewController: UIViewController {
    
-    func foo() {
-        // vuln UIWebView
+    func foo1() {
+        // ruleid: vuln UIWebView
         let webView1 = UIWebView()
         webView1.loadHTMLString("<html><body><p>Hello World!</p></body></html>", baseURL: nil)
     }
@@ -42,11 +42,11 @@ class UIWebViewController: UIViewController {
 
 // Check SFSafariViewController
 class SafariViewController_test: SafariViewController {
-    func foo(_ which: Int) {
+    func foo2(_ which: Int) {
         if let url = URL(string: "https://www.test.net/read/\(which + 1)") {
             let config = SFSafariViewController.Configuration()
             config.entersReaderIfAvailable = true
-	    // vuln SFSafariViewController
+	    // ruleid: vuln SFSafariViewController
             let vc = SFSafariViewController(url: url, configuration: config)
             present(vc, animated: true)
         }
