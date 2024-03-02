@@ -27,18 +27,152 @@ rules:
     languages: [swift]
     patterns:
       - pattern-either:
-          #CryptoSwift (and a try with Apple-Swift-Crypto, Swift-Sodium)
+          #CryptoSwift encryption/decryption
           - patterns:
               - pattern-inside: |
                   $KEY = arrayFrom($Y: $VALUE)
                   ...
-                  $OBJ.$CRYPTO(..., $PSW: $KEY, ...)
+                  $CRYPTO(..., $PAR: $KEY, ...)
               - metavariable-regex:
                   metavariable: $CRYPTO
-                  regex: (?i)(encrypt|decrypt|AES|Blowfish|ChaCha20|XChaCha20|Rabbit)
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
               - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(password|key|using|secretKey) 
+                  metavariable: $PAR
+                  regex: (?i)(key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($Y: $VALUE)
+                  ...
+                  $CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($VALUE)
+                  ...
+                  $CRYPTO(..., $PAR: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
+              - metavariable-regex:
+                  metavariable: $PAR
+                  regex: (?i)(key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($VALUE)
+                  ...
+                  $CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $CRYPTO(..., $PAR: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
+              - metavariable-regex:
+                  metavariable: $PAR
+                  regex: (?i)(key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  let $KEY: $ARRAY = [...]
+                  ...
+                  $CRYPTO(..., $PAR: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $ARRAY
+                  regex: (?i)(Array[\w<>]*) 
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
+              - metavariable-regex:
+                  metavariable: $PAR
+                  regex: (?i)(key|iv)
+          - patterns:
+              - pattern-inside: |
+                  let $KEY: $ARRAY = [...]
+                  ...
+                  $CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $ARRAY
+                  regex: (?i)(Array[\w<>]*) 
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(AES|Blowfish|ChaCha20|Rabbit|HMAC|CBCMAC|Poly1305|CMAC|hChaCha20|XChaCha20|CBC|GCM|CCM|CFB|OFB|PCBC|CTR)
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($Y: $VALUE)
+                  ...
+                  $OBJ.$CRYPTO(..., $PAR: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $OBJ
+                  regex: (?i)(AEADChaCha20Poly1305|chacha|XChaCha20)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|process|hChaCha20)
+              - metavariable-regex:
+                  metavariable: $PAR
+                  regex: (?i)(key|iv)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($Y: $VALUE)
+                  ...
+                  $OBJ.$CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $OBJ
+                  regex: (?i)(AEADChaCha20Poly1305|chacha|XChaCha20)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|process|hChaCha20)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($VALUE)
+                  ...
+                  $OBJ.$CRYPTO(..., $PAR: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $OBJ
+                  regex: (?i)(AEADChaCha20Poly1305|chacha|XChaCha20)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|process|hChaCha20)
+              - metavariable-regex:
+                  metavariable: $PAR
+                  regex: (?i)(key|iv)
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
@@ -48,8 +182,42 @@ rules:
                   ...
                   $OBJ.$CRYPTO(..., $KEY, ...)
               - metavariable-regex:
+                  metavariable: $OBJ
+                  regex: (?i)(AEADChaCha20Poly1305|chacha|XChaCha20)
+              - metavariable-regex:
                   metavariable: $CRYPTO
-                  regex: (?i)(encrypt|decrypt|AES|Blowfish|ChaCha20|XChaCha20|Rabbit)
+                  regex: (?i)(encrypt|decrypt|process|hChaCha20)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $OBJ.$CRYPTO(..., $PAR: $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $OBJ
+                  regex: (?i)(AEADChaCha20Poly1305|chacha|XChaCha20)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|process|hChaCha20)
+              - metavariable-regex:
+                  metavariable: $PAR
+                  regex: (?i)(key|iv) 
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = $VALUE
+                  ...
+                  $OBJ.$CRYPTO(..., $KEY, ...)
+              - metavariable-regex:
+                  metavariable: $OBJ
+                  regex: (?i)(AEADChaCha20Poly1305|chacha|XChaCha20)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(encrypt|decrypt|process|hChaCha20)
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
@@ -57,16 +225,16 @@ rules:
               - pattern-inside: |
                   let $KEY: $ARRAY = [...]
                   ...
-                  $OBJ.$CRYPTO(..., $PSW: $KEY, ...)
+                  $OBJ.$CRYPTO(..., $PAR: $KEY, ...)
               - metavariable-regex:
                   metavariable: $ARRAY
-                  regex: (?i)(Array[\w<>]*) 
+                  regex: (?i)(Array[\w<>]*)
               - metavariable-regex:
                   metavariable: $CRYPTO
                   regex: (?i)(encrypt|decrypt|AES|Blowfish|ChaCha20|XChaCha20|Rabbit)
               - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(password|(.*?)key|using|secretKey)
+                  metavariable: $PAR
+                  regex: (?i)(key|iv)
           - patterns:
               - pattern-inside: |
                   let $KEY: $ARRAY = [...]
@@ -74,7 +242,7 @@ rules:
                   $OBJ.$CRYPTO(..., $KEY, ...)
               - metavariable-regex:
                   metavariable: $ARRAY
-                  regex: (?i)(Array[\w<>]*) 
+                  regex: (?i)(Array[\w<>]*)
               - metavariable-regex:
                   metavariable: $CRYPTO
                   regex: (?i)(encrypt|decrypt|AES|Blowfish|ChaCha20|XChaCha20|Rabbit)
@@ -83,13 +251,43 @@ rules:
               - pattern-inside: |
                   $KEY = arrayFrom($Y: $VALUE)
                   ...
-                  $OBJ.$CRYPTO(..., $PSW: $KEY, ...).calculate()
+                  PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
               - metavariable-regex:
                   metavariable: $CRYPTO
-                  regex: (?i)(PBKDF1|PBKDF2) 
+                  regex: (?i)(PBKDF1|PBKDF2)
               - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(password) 
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($Y: $VALUE)
+                  ...
+                  try? PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($Y: $VALUE)
+                  ...
+                  PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($Y: $VALUE)
+                  ...
+                  try? PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
@@ -97,10 +295,43 @@ rules:
               - pattern-inside: |
                   $KEY = arrayFrom($VALUE)
                   ...
-                  $OBJ.$CRYPTO(..., $KEY, ...).calculate()
+                  PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
               - metavariable-regex:
                   metavariable: $CRYPTO
-                  regex: (?i)(PBKDF1|PBKDF2) 
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($VALUE)
+                  ...
+                  try? PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($VALUE)
+                  ...
+                  PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $VALUE
+                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
+          - patterns:
+              - pattern-inside: |
+                  $KEY = arrayFrom($VALUE)
+                  ...
+                  try? PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
@@ -108,24 +339,79 @@ rules:
               - pattern-inside: |
                   let $KEY: $ARRAY = [...]
                   ...
-                  $OBJ.$CRYPTO(..., $PSW: $KEY, ...).calculate()
+                  PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
               - metavariable-regex:
                   metavariable: $ARRAY
-                  regex: (?i)(Array[\w<>]*) 
+                  regex: (?i)(Array[\w<>]*)
               - metavariable-regex:
                   metavariable: $CRYPTO
-                  regex: (?i)(PBKDF1|PBKDF2)               
-              - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(password)
+                  regex: (?i)(PBKDF1|PBKDF2)
           - patterns:
               - pattern-inside: |
                   let $KEY: $ARRAY = [...]
                   ...
-                  $OBJ.$CRYPTO(..., $KEY, ...).calculate()
+                  try? PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
               - metavariable-regex:
                   metavariable: $ARRAY
-                  regex: (?i)(Array[\w<>]*) 
+                  regex: (?i)(Array[\w<>]*)
               - metavariable-regex:
                   metavariable: $CRYPTO
-                  regex: (?i)(PBKDF1|PBKDF2)               
+                  regex: (?i)(PBKDF1|PBKDF2)
+          - patterns:
+              - pattern-inside: |
+                  let $KEY: $ARRAY = [...]
+                  ...
+                  PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $ARRAY
+                  regex: (?i)(Array[\w<>]*)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+          - patterns:
+              - pattern-inside: |
+                  let $KEY: $ARRAY = [...]
+                  ...
+                  try? PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $ARRAY
+                  regex: (?i)(Array[\w<>]*)
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+          - patterns:
+              - pattern-inside: |
+                  PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $KEY
+                  regex: (?i)(Array\("(.*?)"[\.\w]*\)|Array\('(.*?)'[\.\w]*\)|nil|arrayFrom\("(.*?)"\)|arrayFrom\('(.*?)'\))
+          - patterns:
+              - pattern-inside: |
+                  try? PKCS5.$CRYPTO(..., password: $KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $KEY
+                  regex: (?i)(Array\("(.*?)"[\.\w]*\)|Array\('(.*?)'[\.\w]*\)|nil|arrayFrom\("(.*?)"\)|arrayFrom\('(.*?)'\))
+          - patterns:
+              - pattern-inside: |
+                  PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $KEY
+                  regex: (?i)(Array\("(.*?)"[\.\w]*\)|Array\('(.*?)'[\.\w]*\)|nil|arrayFrom\("(.*?)"\)|arrayFrom\('(.*?)'\))
+          - patterns:
+              - pattern-inside: |
+                  try? PKCS5.$CRYPTO($KEY, ...).calculate()
+              - metavariable-regex:
+                  metavariable: $CRYPTO
+                  regex: (?i)(PBKDF1|PBKDF2)
+              - metavariable-regex:
+                  metavariable: $KEY
+                  regex: (?i)(Array\("(.*?)"[\.\w]*\)|Array\('(.*?)'[\.\w]*\)|nil|arrayFrom\("(.*?)"\)|arrayFrom\('(.*?)'\))

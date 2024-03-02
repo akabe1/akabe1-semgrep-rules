@@ -116,6 +116,8 @@ class CryptoViewController: UIViewController {
     func foo6() {
         let keyBytes = UnsafeMutableRawPointer.allocate(byteCount: 128, alignment: 1)
         let keyData = Data(bytes: keyBites, count: 128)
+        let ivBytes = UnsafeMutableRawPointer.allocate(byteCount: 16, alignment: 1)
+        let ivData = Data(bytes: keyBites, count: 16)
 	let message = "Top Secret Message"
 	let data: NSData! = (message as NSString).dataUsingEncoding(NSUTF8StringEncoding) as NSData!
 	let cryptData = NSMutableData(length: Int(data.length) + kCCBlockSizeAES128)!
@@ -129,7 +131,7 @@ class CryptoViewController: UIViewController {
     		algoritm,
     		options,
     		keyData.bytes, keyLength,
-    		nil,
+    		ivData.bytes,
     		data.bytes, data.length,
     		cryptData.mutableBytes, cryptData.length,
     		&numBytesEncrypted)
@@ -146,6 +148,7 @@ class CryptoViewController: UIViewController {
     	var outputBuffer = Array<UInt8>(repeating: 0, 
                                     count: cipherTextLength)
     	var numBytesDecrypted = 0
+    	// ruleid: vuln static hardcoded key
     	let status = CCCrypt(CCOperation(kCCDecrypt),
                          CCAlgorithm(kCCAlgorithmAES),
                          CCOptions(kCCOptionPKCS7Padding),
@@ -535,29 +538,146 @@ class CryptoViewController: UIViewController {
         let password: Array<UInt8> = [0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64]
         let salt: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a, 0x5d, 0x63, 0xcb, 0x06]
         // ruleid: vuln static hardcoded key
-        let value = try PKCS5.PBKDF1(password: password, salt: salt, iterations: 1000, keyLength: 16).calculate()
+        let value = try PKCS5.PBKDF1(salt: salt, password: password, iterations: 1000, keyLength: 16).calculate()
+        XCTAssertEqual(value.toHexString(), "dc19847e05c64d2faf10ebfb4a3d2a20")
+    }
+    
+    
+    func foo31() {
+        var password = arrayFrom(hexstring: "2b7e151628aed2a6abf7158809cf4f3c")
+        let salt: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a, 0x5d, 0x63, 0xcb, 0x06]
+        // ruleid: vuln static hardcoded key
+        let value = PKCS5.PBKDF2(password: password, salt: salt, iterations: 1000, variant: .SHA1, keyLength: 16).calculate()
+        XCTAssertEqual(value.toHexString(), "dc19847e05c64d2faf10ebfb4a3d2a20")
+    } 
+    
+    
+    
+    func foo32() {
+        let password: Array<UInt8> = [0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64]
+        let salt: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a, 0x5d, 0x63, 0xcb, 0x06]
+        // ruleid: vuln static hardcoded key
+        let value = try PKCS5.PBKDF1(salt: salt, password: password, iterations: 1000, keyLength: 16).calculate()
+        XCTAssertEqual(value.toHexString(), "dc19847e05c64d2faf10ebfb4a3d2a20")
+    }
+    
+    
+    func foo33() {
+        var password = arrayFrom("2b7e151628aed2a6abf7158809cf4f3c")
+        let salt: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a, 0x5d, 0x63, 0xcb, 0x06]
+        // ruleid: vuln static hardcoded key
+        let value = try PKCS5.PBKDF1(password, salt, 1000, 16).calculate()
         XCTAssertEqual(value.toHexString(), "dc19847e05c64d2faf10ebfb4a3d2a20")
     }
     
     
     
-    func foo31() {
+    func foo34() {
         let salt: Array<UInt8> = Array("saltsalt".utf8)
         // ruleid: vuln static hardcoded key
         let value = PKCS5.PBKDF1(password: Array("secretpass".utf8), salt: salt, iterations: 1000, keyLength: 16).calculate()
 	return value
     }
     
-        
-     
-    func foo32() {
-        let key = "secretpass"
-        let iv = AES.randomIV(AES.blockSize)
+    
+    func foo35(salt: Data) {
         // ruleid: vuln static hardcoded key
+        let value = try PKCS5.PBKDF2(password: nil, salt: salt, iterations: 1000, variant: .SHA1, keyLength: 16).calculate()
+        XCTAssertEqual(value.toHexString(), "dc19847e05c64d2faf10ebfb4a3d2a20")
+    }
+    
+    
+    func foo36() {
+        // ruleid: vuln static hardcoded key
+        let value = PKCS5.PBKDF1(salt: Array("saltsalt".utf8), iterations: 1000, password: Array("secretpass"), keyLength: 16).calculate()
+	return value
+    }
+    
+    
+    func foo37() {
+        // ruleid: vuln static hardcoded key
+        let value = PKCS5.PBKDF1(Array("secretpass"), Array("saltsalt".utf8), 1000, 16).calculate()
+	return value
+    }
+    
+        
+    
+    func foo38() {
+        let key = "secretpass"
+        let iv = "123456"
+        // ruleid: vuln static hardcoded key and iv
         let aesenc = try AES(key: key, blockMode: CBC(iv: iv), padding: .pkcs7)
         let encryptedBytes = try aesenc.encrypt(inputData.bytes)
         let encryptedData = Data(encryptedBytes)
 	return encryptedData
+    }
+
+
+    func foo39() {
+        let key = "secretpass"
+        let iv = AES.randomIV(AES.blockSize)
+        // ruleid: vuln static hardcoded key
+        let aesenc = AES(key: key, blockMode: CBC(iv: iv), padding: .pkcs7)
+        let encryptedBytes = try aesenc.encrypt(inputData.bytes)
+        let encryptedData = Data(encryptedBytes)
+	return encryptedData
+    }
+
+
+    func foo40() {
+        let plaintext = "test"
+        let key: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a, 0x5d, 0x63, 0xcb, 0x06]
+        let iv: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a]
+        // ruleid: vuln static hardcoded key and iv
+        let encrypted = try AEADChaCha20Poly1305.encrypt(plaintext, key: key, iv: nonce, authenticationHeader: header)
+        return encrypted
+    }
+
+    
+    func foo41() {
+        let plaintext = "test"
+        let key: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a, 0x5d, 0x63, 0xcb, 0x06]
+        let iv: Array<UInt8> = [0x78, 0x57, 0x8e, 0x5a]
+        // ruleid: vuln static hardcoded key and iv
+        let cipher = try ChaCha20(key: key, iv: iv)
+        return try self.encrypt(cipher: cipher, plainText, key: key, iv: iv, authenticationHeader: authenticationHeader)
+    }
+
+
+    func foo42() {
+        var key = arrayFrom(hexstring: "2b7e151628aed2a6abf7158809cf4f3c")
+        var counter: Array<UInt8> = [1, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 74, 0, 0, 0, 0]
+        let input = Array<UInt8>.init(repeating: 0, count: 129)
+        // ruleid: vuln static hardcoded key 
+        let chacha = try! ChaCha20(key: key, iv: Array(key[4..<16]))
+        let result = chacha.process(bytes: input.slice, counter: &counter, key: key)
+    }
+
+    
+    func foo43() {
+        var key = arrayFrom("2b7e151628aed2a6abf7158809cf4f3c")
+        let plainText = Array<UInt8>(repeating: 0, count: 48)
+        // ruleid: vuln static hardcoded key
+        let rabbit = try! Rabbit(key: key, iv: Array(key[4..<16]))
+        let cipherText = try! rabbit.encrypt(plainText)
+    }
+
+
+    func foo44() {
+        var key = arrayFrom(hexstring: "2b7e151628aed2a6abf7158809cf4f3c")
+        let plainText = Array<UInt8>(repeating: 0, count: 48)
+        // ruleid: vuln static hardcoded key
+        let rabbit = try! Rabbit(key, Array(key[4..<16]))
+        let cipherText = try! rabbit.encrypt(plainText)
+    }
+    
+
+    func foo45(key: String) {
+        var iv = arrayFrom(hexstring: "2b7e151628aed2a6abf7158809cf4f3c")
+        let plainText = Array<UInt8>(repeating: 0, count: 48)
+        // ruleid: vuln static hardcoded iv
+        let rabbit = try! Rabbit(key, iv)
+        let cipherText = try! rabbit.encrypt(plainText)
     }
     
 }   
@@ -566,7 +686,7 @@ class CryptoViewController: UIViewController {
 class CryptoViewController: UIViewController { 
 // Check Apple-Swift-Crypto and Swift-Sodium /////////////////////////  
 
-    func foo33() {        
+    func foo46() {        
         let message = Data("this is a message".utf8)
         // ruleid: vuln static hardcoded key
         let skey = arrayFrom(hexString: "pass123") 
@@ -575,7 +695,7 @@ class CryptoViewController: UIViewController {
     }
     
     
-    func foo34() {        
+    func foo47() {        
         let message = Data("this is a message".utf8)
         // ruleid: vuln static hardcoded key
         let skey = arrayFrom(hexString: "pass123") 
@@ -584,8 +704,7 @@ class CryptoViewController: UIViewController {
     }
 
 
-
-    func foo35() {
+    func foo48() {
         let sodium = Sodium()
         // ruleid: vuln static hardcoded key
         let pass = "pass123"
@@ -596,7 +715,7 @@ class CryptoViewController: UIViewController {
 
 
    
-   func foo36() {
+   func foo49() {
         let sodium = Sodium()
         let message1 = "Message 1".bytes
 	let message2 = "Message 2".bytes
@@ -612,6 +731,5 @@ class CryptoViewController: UIViewController {
    
 }
     
-
 
 

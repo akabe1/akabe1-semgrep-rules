@@ -336,4 +336,4 @@ rules:
                   regex: (encrypt|decrypt|encryptData|decryptData)
               - metavariable-regex:
                   metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\(\))          
+                  regex: ("(.*?)"|'(.*?)'|nil|String\(\))

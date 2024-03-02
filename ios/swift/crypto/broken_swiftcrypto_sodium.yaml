@@ -31,31 +31,10 @@ rules:
           #Apple-Swift-Crypto and Swift-Sodium
           - patterns:
               - pattern-inside: |
-                  $CRYPTO(..., $VALUE, ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
                   $OBJ.$CRYPTO(..., $VALUE, ...)
               - metavariable-regex:
                   metavariable: $CRYPTO
                   regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
-                  $CRYPTO(..., $PSW: $VALUE, ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(using|secretKey|key|passwd)
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
@@ -75,35 +54,10 @@ rules:
               - pattern-inside: |
                   $KEY = $VALUE
                   ...
-                  $CRYPTO(..., $KEY, ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
-                  $KEY = $VALUE
-                  ...
                   $OBJ.$CRYPTO(..., $KEY, ...)
               - metavariable-regex:
                   metavariable: $CRYPTO
                   regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
-                  $KEY = $VALUE
-                  ...
-                  $CRYPTO(..., $PSW: $KEY, ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(using|secretKey|key|passwd)
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
@@ -125,35 +79,10 @@ rules:
               - pattern-inside: |
                   $KEY = $VALUE
                   ...
-                  $CRYPTO(..., Array($KEY), ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
-                  $KEY = $VALUE
-                  ...
                   $OBJ.$CRYPTO(..., Array($KEY), ...)
               - metavariable-regex:
                   metavariable: $CRYPTO
                   regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
-                  $KEY = $VALUE
-                  ...
-                  $CRYPTO(..., $PSW: Array($KEY), ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(using|secretKey|key|passwd)
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
@@ -175,17 +104,6 @@ rules:
               - pattern-inside: |
                   let $KEY: $ARRAY = [...]
                   ...
-                  $CRYPTO(..., $KEY, ...)
-              - metavariable-regex:
-                  metavariable: $ARRAY
-                  regex: (?i)(Array[\w<>]*) 
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-          - patterns:
-              - pattern-inside: |
-                  let $KEY: $ARRAY = [...]
-                  ...
                   $OBJ.$CRYPTO(..., $KEY, ...)
               - metavariable-regex:
                   metavariable: $ARRAY
@@ -197,20 +115,6 @@ rules:
               - pattern-inside: |
                   let $KEY: $ARRAY = [...]
                   ...
-                  $CRYPTO(..., $PSW: $KEY, ...)
-              - metavariable-regex:
-                  metavariable: $ARRAY
-                  regex: (?i)(Array[\w<>]*)
-              - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(using|secretKey|key|passwd)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-          - patterns:
-              - pattern-inside: |
-                  let $KEY: $ARRAY = [...]
-                  ...
                   $OBJ.$CRYPTO(..., $PSW: $KEY, ...)
               - metavariable-regex:
                   metavariable: $ARRAY
@@ -225,20 +129,6 @@ rules:
               - pattern-inside: |
                   $KEY = arrayFrom($Y: $VALUE)
                   ...
-                  $CRYPTO(..., $PSW: $KEY, ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b)
-              - metavariable-regex:
-                  metavariable: $PSW
-                  regex: (?i)(using|secretKey|key|passwd) 
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
-                  $KEY = arrayFrom($Y: $VALUE)
-                  ...
                   $OBJ.$CRYPTO(..., $PSW: $KEY, ...)
               - metavariable-regex:
                   metavariable: $CRYPTO
@@ -246,17 +136,6 @@ rules:
               - metavariable-regex:
                   metavariable: $PSW
                   regex: (?i)(using|secretKey|key|passwd)
-              - metavariable-regex:
-                  metavariable: $VALUE
-                  regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
-          - patterns:
-              - pattern-inside: |
-                  $KEY = arrayFrom($VALUE)
-                  ...
-                  $CRYPTO(..., $KEY, ...)
-              - metavariable-regex:
-                  metavariable: $CRYPTO
-                  regex: (?i)(\bseal\b|\bopen\b|\bderive\b|\bderiveKey\b|\bhash\b|\bstr\b|\binitPush\b|\binitPull\b|\bsign\b) 
               - metavariable-regex:
                   metavariable: $VALUE
                   regex: ("(.*?)"|'(.*?)'|nil|String\((.*?)\))
