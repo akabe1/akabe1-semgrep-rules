@@ -176,5 +176,9 @@ rules:
               DocumentBuilderFactory $DBF = ... ;
               ...
               $DBF.newDocumentBuilder(...);
+          - pattern: |
+              DocumentBuilder $DB = ... ;
+              ...
+              $DB.parse(...);
           #- pattern: $DBF = DocumentBuilderFactory.newInstance(...);
           #- pattern: $DBF = new DocumentBuilderFactory(...);
