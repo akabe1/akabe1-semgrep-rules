@@ -18,15 +18,14 @@ rules:
       It is recommended to disable external entities following the OWASP prevention cheat sheet.
       In particular to disable DTDs entirely for DocumentBuilderFactory it is recommended to set
       to TRUE the feature "http://apache.org/xml/features/disallow-doctype-decl".
-      Alternatively it is suggested to disable the three attributes: ACCESS_EXTERNAL_DTD,
-      ACCESS_EXTERNAL_SCHEMA, and ACCESS_EXTERNAL_STYLESHEET setting them to empty string.
-      If these remediations are not possible, then at least any of the following partial mitigations
-      are suggested:
-      - allow DOCTYPE declarations and only disable external entities (internal common entities are
-      enabled) by setting to false both the features "http://xml.org/sax/features/external-general-entities",
-      "http://xml.org/sax/features/external-parameter-entities", and "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-      - disable some entity properties by configuring both "setXIncludeAware" and "setExpandEntityReferences"
-      by setting them to FALSE (still vulnerable to DoS and SSRF attacks).
+      Alternatively it is possible to disable the communication protocols 
+      for XML external entities by setting to an empty string the JAXP properties 
+      "XMLConstants.ACCESS_EXTERNAL_DTD" and "XMLConstants.ACCESS_EXTERNAL_SCHEMA".
+      Another alternative mitigation could be to allow DOCTYPE declarations and only disable external
+      entities (internal common entities are enabled) by setting to FALSE the features
+      "http://xml.org/sax/features/external-general-entities",
+      "http://xml.org/sax/features/external-parameter-entities" and
+      "http://apache.org/xml/features/nonvalidating/load-external-dtd".
     languages: [java]
     patterns:
       - pattern-not-inside: |
@@ -118,53 +117,9 @@ rules:
             ...
             $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-            ...
           }
       - pattern-not-inside: |
           $RETURNTYPE $METHOD(...) {
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            ...
-          }
-      - pattern-not-inside: |
-          $RETURNTYPE $METHOD(...) {
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-            ...
-          }
-      - pattern-not-inside: |
-          $RETURNTYPE $METHOD(...) {
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            ...
-          }
-      - pattern-not-inside: |
-          $RETURNTYPE $METHOD(...) {
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            ...
-          }
-      - pattern-not-inside: |
-          $RETURNTYPE $METHOD(...) {
-            ...
-            $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
             ...
             $DBF.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             ...
@@ -180,5 +135,9 @@ rules:
               DocumentBuilder $DB = ... ;
               ...
               $DB.parse(...);
+          - pattern: |
+              DocumentBuilderFactory $DBF = ... ;
+              ...
+              $DBF.newDocumentBuilder(...).parse(...);
           #- pattern: $DBF = DocumentBuilderFactory.newInstance(...);
           #- pattern: $DBF = new DocumentBuilderFactory(...);

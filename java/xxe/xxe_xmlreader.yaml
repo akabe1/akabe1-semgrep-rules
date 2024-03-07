@@ -18,8 +18,11 @@ rules:
       It is recommended to disable external entities following the OWASP prevention cheat sheet.
       In particular is suggested to disable DTDs entirely for XMLReader set the feature
       "http://apache.org/xml/features/disallow-doctype-decl" to TRUE.
-      An alternative partial mitigation could be to allow DOCTYPE declarations and only disable external
-      entities (internal common entities are enabled) by setting to FALSE both the features
+      Alternatively it is possible to disable the communication protocols 
+      for XML external entities by setting to an empty string the JAXP properties 
+      "XMLConstants.ACCESS_EXTERNAL_DTD" and "XMLConstants.ACCESS_EXTERNAL_SCHEMA".
+      Another alternative mitigation could be to allow DOCTYPE declarations and only disable external
+      entities (internal common entities are enabled) by setting to FALSE both features
       "http://xml.org/sax/features/external-general-entities",
       "http://xml.org/sax/features/external-parameter-entities" and
       "http://apache.org/xml/features/nonvalidating/load-external-dtd".
@@ -28,73 +31,89 @@ rules:
       - pattern-not-inside: |
           $RETURNTYPE $METHOD(...) {
             ...
-            $XMLREADER.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            $XR.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             ...
           }
       - pattern-not-inside: |
           $RETURNTYPE $METHOD(...) {
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            $XR.setFeature("http://xml.org/sax/features/external-general-entities", false);
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            $XR.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             ...
-            $XMLREADER.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            ...
-          }
-      - pattern-not-inside: |
-          $RETURNTYPE $METHOD(...) {
-            ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            ...
-            $XMLREADER.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            $XR.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             ...
           }
       - pattern-not-inside: |
           $RETURNTYPE $METHOD(...) {
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            $XR.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             ...
-            $XMLREADER.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            $XR.setFeature("http://xml.org/sax/features/external-general-entities", false);
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            ...
-          }
-      - pattern-not-inside: |
-          $RETURNTYPE $METHOD(...) {
-            ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            ...
-            $XMLREADER.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            $XR.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             ...
           }
       - pattern-not-inside: |
           $RETURNTYPE $METHOD(...) {
             ...
-            $XMLREADER.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            $XR.setFeature("http://xml.org/sax/features/external-general-entities", false);
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            $XR.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            $XR.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             ...
           }
       - pattern-not-inside: |
           $RETURNTYPE $METHOD(...) {
             ...
-            $XMLREADER.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            $XR.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            $XR.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             ...
-            $XMLREADER.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            $XR.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XR.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            ...
+            $XR.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            ...
+            $XR.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XR.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            ...
+            $XR.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            ...
+            $XR.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XR.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            ...
+            $XR.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+          }
+      - pattern-not-inside: |
+          $RETURNTYPE $METHOD(...) {
+            ...
+            $XR.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            ...
+            $XR.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             ...
           }
       - pattern-either:
           - pattern: |
-                XMLReader $XMLREADER = ... ;
+                XMLReader $XR = ... ;
                 ...
-                $XMLREADER.parse(...);
-          #- pattern: $XMLREADER = XMLReaderFactory.createXMLReader(...);
-          #- pattern: $XMLREADER = $SPF.getXMLReader();
+                $XR.parse(...);
+          #- pattern: $XR = XMLReaderFactory.createXMLReader(...);
+          #- pattern: $XR = $SPF.getXMLReader();
