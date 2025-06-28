@@ -100,16 +100,15 @@
        EXEC SQL OPEN C1 END-EXEC
        EXEC SQL FETCH C1 INTO :HV-EMPNAME END-EXEC
        IF SQLCODE = 0
-           DISPLAY "Dipendente: " HV-EMPNAME
+           DISPLAY "Employee: " HV-EMPNAME
        EXEC SQL FETCH C1 INTO :HV-EMPNAME END-EXEC
        IF SQLCODE = 0
-           DISPLAY "Dipendente: " HV-EMPNAME
+           DISPLAY "Employee: " HV-EMPNAME
        EXEC SQL FETCH C1 INTO :HV-EMPNAME END-EXEC
        IF SQLCODE = 0
-           DISPLAY "Dipendente: " HV-EMPNAME
+           DISPLAY "Employee: " HV-EMPNAME
        EXEC SQL CLOSE C1 END-EXEC
        
        
-
 
        STOP RUN.
