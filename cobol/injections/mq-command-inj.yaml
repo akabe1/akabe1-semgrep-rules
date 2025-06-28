@@ -1,0 +1,110 @@
+rules:
+  - id: mq-command-inj
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      confidence: high
+    references:
+      - https://owasp.org/www-community/attacks/Command_Injection
+      - https://cwe.mitre.org/data/definitions/77.html
+    category: security
+    message: >-
+      Detected COBOL code that seems vulnerable to MQ Command Injection, because unavlidated user input is passed to CALL some specific MQ commands.
+      It is recommended to perform a proper data validation before process user controlled input.
+    languages: [generic]
+    options:
+      generic_engine: aliengrep
+      generic_multiline: true
+      generic_extra_word_characters: ["-"]
+      generic_caseless: true
+    paths: 
+      include:
+      - '*.cbl'
+      - '*.cob'
+      - '*.ccp'
+      - '*.cpy'
+      - '*.sqb'
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  CALL "$MQ" USING $INPUT
+              - metavariable-regex:
+                  metavariable: $MQ
+                  regex: (?i)\b(MQCONN|MQDISC|MQOPEN|MQCLOSE|MQSET|MQINQ|MQGET|MQPUT|MQPUT1)\b
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  CALL '$MQ' USING $INPUT
+              - metavariable-regex:
+                  metavariable: $MQ
+                  regex: (?i)\b(MQCONN|MQDISC|MQOPEN|MQCLOSE|MQSET|MQINQ|MQGET|MQPUT|MQPUT1)\b
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  CALL "$MQ" USING ..., $INPUT
+              - metavariable-regex:
+                  metavariable: $MQ
+                  regex: (?i)\b(MQCONN|MQDISC|MQOPEN|MQCLOSE|MQSET|MQINQ|MQGET|MQPUT|MQPUT1)\b
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  CALL '$MQ' USING ..., $INPUT
+              - metavariable-regex:
+                  metavariable: $MQ
+                  regex: (?i)\b(MQCONN|MQDISC|MQOPEN|MQCLOSE|MQSET|MQINQ|MQGET|MQPUT|MQPUT1)\b
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  CALL "$MQ" USING ..., ..., $INPUT
+              - metavariable-regex:
+                  metavariable: $MQ
+                  regex: (?i)\b(MQCONN|MQDISC|MQOPEN|MQCLOSE|MQSET|MQINQ|MQGET|MQPUT|MQPUT1)\b
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  CALL '$MQ' USING ..., ..., $INPUT
+              - metavariable-regex:
+                  metavariable: $MQ
+                  regex: (?i)\b(MQCONN|MQDISC|MQOPEN|MQCLOSE|MQSET|MQINQ|MQGET|MQPUT|MQPUT1)\b
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+          - patterns:
+              - pattern-inside: |
+                  ACCEPT $INPUT
+                  ...
+                  STRING ... $INPUT... INTO $CMD
+                  ...
+                  CALL '$MQ' USING $CMD
+              - metavariable-regex:
+                  metavariable: $MQ
+                  regex: (?i)\b(MQCONN|MQDISC|MQOPEN|MQCLOSE|MQSET|MQINQ|MQGET|MQPUT|MQPUT1)\b
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+              - metavariable-regex:
+                  metavariable: $CMD
+                  regex: ([A-Za-z0-9\-]+)
