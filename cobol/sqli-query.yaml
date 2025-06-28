@@ -1,0 +1,126 @@
+rules:
+  - id: sqli-query
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      confidence: high
+    references:
+      - https://owasp.org/www-community/attacks/SQL_Injection
+      - https://cwe.mitre.org/data/definitions/89.html
+    category: security
+    message: >-
+      Detected COBOL code vulnerable to SQL Injection, because the SQL query is built insecurely by concatenating strings with unvalidated user input.
+      It is recommended to adopt prepared statements when building a SQL query with untrusted data.
+    languages: [generic]
+    options:
+      generic_engine: aliengrep
+      generic_multiline: true
+      generic_extra_word_characters: ["-"]
+      generic_caseless: true
+    paths: 
+      include:
+      - '*.cbl'
+      - '*.cob'
+      - '*.ccp'
+      - '*.cpy'
+      - '*.sqb'
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  STRING "$STR ..." ... $INPUT... INTO $QUERY
+                  ...
+                  END-STRING
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
+              - metavariable-regex:
+                  metavariable: $INPUT
+                  regex: ([A-Za-z0-9\-]+)
+              - metavariable-regex:
+                  metavariable: $QUERY
+                  regex: ([A-Za-z0-9\-]+)
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  STRING "$STR ... (" ... $INPUT... INTO $QUERY
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  MOVE "$STR ..." TO $QUERY
+                  ...
+                  STRING $QUERY ... $INPUT... INTO $QUERY
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  SET $QUERY TO "$STR ..."
+                  ...
+                  STRING $QUERY ... $INPUT... INTO $QUERY
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  STRING '$STR ...' ... $INPUT... INTO $QUERY
+                  ...
+                  END-STRING
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  STRING "$STR ... (" ... $INPUT... INTO $QUERY
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  MOVE '$STR ...' TO $QUERY
+                  ...
+                  STRING $QUERY ... $INPUT... INTO $QUERY
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
+          - patterns:
+              - pattern:
+                  ACCEPT $INPUT
+                  ...
+                  SET $QUERY TO '$STR ...'
+                  ...
+                  STRING $QUERY ... $INPUT... INTO $QUERY
+                  ...
+                  EXEC SQL
+              - metavariable-regex:
+                  metavariable: $STR
+                  regex: (?i)\b(ALTER|CREATE|DELETE|DROP|EXEC|EXECUTE|INSERT|MERGE|SELECT|UPDATE|UNION)\b.*
