@@ -1,0 +1,65 @@
+rules:
+  - id: improper-error-handling
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      confidence: high
+    references:
+      - https://owasp.org/www-community/Improper_Error_Handling
+      - https://cwe.mitre.org/data/definitions/209.html
+    category: security
+    message: >-
+      Detected COBOL code that seems improperly handling errors, because the detailed error message are printed in output or into a file.
+      An attacker could abuse this issue to retrieve reserved information about the infrastructure on which is running the program.
+      It is recommended to generate only generic error messages, cleared of any reserved information, in Production environment.
+    languages: [generic]
+    options:
+      generic_engine: aliengrep
+      generic_multiline: true
+      generic_extra_word_characters: ["-"]
+      generic_caseless: true
+    paths: 
+      include:
+      - '*.cbl'
+      - '*.cob'
+      - '*.ccp'
+      - '*.cpy'
+      - '*.sqb'
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: DISPLAY "..." SQLERRMC
+          - patterns:
+              - pattern: DISPLAY "..." SQLSTATE
+          - patterns:
+              - pattern: DISPLAY '...' SQLERRMC
+          - patterns:
+              - pattern: DISPLAY '...' SQLSTATE
+          - patterns:
+              - pattern: |
+                  STRING ... SQLSTATE ... INTO $EMSG
+                  ...
+                  WRITE $EMSG
+                  ...
+                  CLOSE $ERRFILE
+          - patterns:
+              - pattern: |
+                  STRING ... SQLSTATE ... INTO $EMSG
+                  ...
+                  REWRITE $EMSG
+                  ...
+                  CLOSE $ERRFILE
+          - patterns:
+              - pattern: |
+                  STRING ... SQLERRMC ... INTO $EMSG
+                  ...
+                  WRITE $EMSG
+                  ...
+                  CLOSE $ERRFILE
+          - patterns:
+              - pattern: |
+                  STRING ... SQLERRMC ... INTO $EMSG
+                  ...
+                  REWRITE $EMSG
+                  ...
+                  CLOSE $ERRFILE
