@@ -1,0 +1,29 @@
+rules:
+  - id: debug-display-write
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      confidence: low
+    references:
+      - https://owasp.org/www-project-top-10-infrastructure-security-risks/docs/2023/INT08_2023-Information_Leakage
+      - https://cwe.mitre.org/data/definitions/231.html
+    category: security
+    message: >-
+      Detected COBOL code potentially vulnerable to Information Leakage, due that it seems printing/writing some debug information.
+      It is recommended to avoid to print/write debug information in Production environment.
+    languages: [generic]
+    paths: 
+      include:
+      - '*.cbl'
+      - '*.cob'
+      - '*.ccp'
+      - '*.cpy'
+      - '*.sqb'
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-regex: (?i)(DISPLAY|WRITE)\s+.*DEBUG
+          - patterns:
+              - pattern-regex: (?i)\s+D\s+(DISPLAY|WRITE)\s+.*
+      - pattern-not-regex: (?i)\*\s*.*\s+.*DEBUG
+      - pattern-not-regex: (?i)\*\s+D\s+(DISPLAY|WRITE)\s+.*
