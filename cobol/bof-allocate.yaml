@@ -1,0 +1,188 @@
+rules:
+  - id: bof-allocate
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      confidence: high
+    references:
+      - https://owasp.org/www-community/vulnerabilities/Buffer_Overflow
+      - https://cwe.mitre.org/data/definitions/120.html
+    category: security
+    message: >-
+      Detected COBOL code that seems vulnerable to Buffer Overflow due the absence of size controls during dynamic allocation operation to avoid the writing of user controlled data from larger to smaller field.
+      It is recommended to perform a proper data validation to limit the size of user controlled data before storing it.
+    languages: [generic]
+    options:
+      generic_engine: aliengrep
+      generic_multiline: true
+      generic_extra_word_characters: ["-"]
+      generic_caseless: true
+    paths: 
+      include:
+      - '*.cbl'
+      - '*.cob'
+      - '*.ccp'
+      - '*.cpy'
+      - '*.sqb'
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $PTR USAGE POINTER
+                  ...
+                  $LONG PIC $X($VAL1)
+                  ...
+                  ALLOCATE $LEN CHARACTERS INITIALIZED RETURNING $PTR
+                  ...
+                  SET ADDRESS OF $SHORT TO $PTR
+                  ...
+                  MOVE $LONG TO $SHORT 
+              - metavariable-comparison:
+                  comparison: $LEN < $VAL1
+                  metavariable: $VAL1 $LEN
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $PTR USAGE POINTER
+                  ...
+                  $LONG PIC $X($VAL1)
+                  ...
+                  ALLOCATE $LEN CHARACTERS RETURNING $PTR
+                  ...
+                  SET ADDRESS OF $SHORT TO $PTR
+                  ...
+                  MOVE $LONG TO $SHORT 
+              - metavariable-comparison:
+                  comparison: $LEN < $VAL1
+                  metavariable: $VAL1 $LEN
+          #- patterns:
+          #    - pattern-inside: |
+          #        WORKING-STORAGE SECTION
+          #        ...
+          #        $PTR USAGE POINTER
+          #        ...
+          #        $SHORT PIC $X($VAL2)
+          #        ...
+          #        $LONG PIC $X($VAL1)
+          #        ...
+          #        ALLOCATE $LEN CHARACTERS INITIALIZED RETURNING $PTR
+          #        ...
+          #        SET ADDRESS OF $SHORT TO $PTR
+          #        ...
+          #        MOVE $LONG TO $SHORT 
+          #    - metavariable-comparison:
+          #        comparison: $LEN < $VAL1
+          #        metavariable: $VAL1 $LEN
+          #- patterns:
+          #    - pattern-inside: |
+          #        WORKING-STORAGE SECTION
+          #        ...
+          #        $PTR USAGE POINTER
+          #        ...
+          #        $LONG PIC $X($VAL1)
+          #        ...
+          #        $SHORT PIC $X($VAL2)
+          #        ...
+          #        ALLOCATE $LEN CHARACTERS INITIALIZED RETURNING $PTR
+          #        ...
+          #        SET ADDRESS OF $SHORT TO $PTR
+          #        ...
+          #        MOVE $LONG TO $SHORT 
+          #    - metavariable-comparison:
+          #        comparison: $LEN < $VAL1
+          #        metavariable: $VAL1 $LEN
+          #          - patterns:
+          #    - pattern-inside: |
+          #        WORKING-STORAGE SECTION
+          #        ...
+          #        $PTR USAGE POINTER
+          #        ...
+          #        $SHORT PIC $X($VAL2)
+          #        ...
+          #        $LONG PIC $X($VAL1)
+          #        ...
+          #        ALLOCATE $LEN CHARACTERS RETURNING $PTR
+          #        ...
+          #        SET ADDRESS OF $SHORT TO $PTR
+          #        ...
+          #        MOVE $LONG TO $SHORT 
+          #    - metavariable-comparison:
+          #        comparison: $LEN < $VAL1
+          #        metavariable: $VAL1 $LEN
+          #- patterns:
+          #    - pattern-inside: |
+          #        WORKING-STORAGE SECTION
+          #        ...
+          #        $PTR USAGE POINTER
+          #        ...
+          #        $LONG PIC $X($VAL1)
+          #        ...
+          #        $SHORT PIC $X($VAL2)
+          #        ...
+          #        ALLOCATE $LEN CHARACTERS RETURNING $PTR
+          #        ...
+          #        SET ADDRESS OF $SHORT TO $PTR
+          #        ...
+          #        MOVE $LONG TO $SHORT 
+          #    - metavariable-comparison:
+          #        comparison: $LEN < $VAL1
+          #        metavariable: $VAL1 $LEN
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $SHORT PIC $X($VAL2) BASED
+                  ...
+                  $LONG PIC $X($VAL1)
+                  ...
+                  ALLOCATE $SHORT INITIALIZED
+                  ...
+                  MOVE $LONG TO $SHORT 
+              - metavariable-comparison:
+                  comparison: $VAL2 < $VAL1
+                  metavariable: $VAL1 $VAL2
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $LONG PIC $X($VAL1)
+                  ...
+                  $SHORT PIC $X($VAL2) BASED
+                  ...
+                  ALLOCATE $SHORT INITIALIZED
+                  ...
+                  MOVE $LONG TO $SHORT 
+              - metavariable-comparison:
+                  comparison: $VAL2 < $VAL1
+                  metavariable: $VAL1 $VAL2
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $SHORT PIC $X($VAL2) BASED
+                  ...
+                  $LONG PIC $X($VAL1)
+                  ...
+                  ALLOCATE $SHORT
+                  ...
+                  MOVE $LONG TO $SHORT 
+              - metavariable-comparison:
+                  comparison: $VAL2 < $VAL1
+                  metavariable: $VAL1 $VAL2
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $LONG PIC $X($VAL1)
+                  ...
+                  $SHORT PIC $X($VAL2) BASED
+                  ...
+                  ALLOCATE $SHORT
+                  ...
+                  MOVE $LONG TO $SHORT 
+              - metavariable-comparison:
+                  comparison: $VAL2 < $VAL1
+                  metavariable: $VAL1 $VAL2
