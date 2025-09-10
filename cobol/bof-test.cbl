@@ -27,6 +27,9 @@
        77 DEST-FIELD           PIC X(10).
        77 MAX-LEN              PIC 9 VALUE 10.
        77 RETURN-CODE          PIC S9(4) COMP.
+       
+       01 ARR OCCURS 22 TIMES
+          10 ARR-FIELD         PIC X(12).
 
        PROCEDURE DIVISION.
        
@@ -74,5 +77,14 @@
        ACCEPT LONG-INPUT
        IF FUNCTION LENGTH(LONG-INPUT) <= LENGTH OF SHORT-FIELD
        MOVE LONG-INPUT TO SHORT-FIELD.
+       
+       
+       * --- ruleid : vuln bof ---                             
+       MOVE ARR-FIELD(23) TO VAR. 
+       
+       
+       * --- ok : vuln bof ---                             
+       MOVE ARR(21) TO VAR. 
+       
 
        STOP RUN.

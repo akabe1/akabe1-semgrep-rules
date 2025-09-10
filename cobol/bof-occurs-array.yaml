@@ -1,0 +1,99 @@
+rules:
+  - id: bof-occurs-array
+    severity: WARNING
+    metadata:
+      author: Maurizio Siddu
+      confidence: high
+    references:
+      - https://owasp.org/www-community/vulnerabilities/Buffer_Overflow
+      - https://cwe.mitre.org/data/definitions/120.html
+    category: security
+    message: >-
+      Detected COBOL code that seems vulnerable to Buffer Overflow due the absence of size controls during writing operation on an array, the writing out of bounds on an array could cause malfunctions of the application at runtime.
+    languages: [generic]
+    options:
+      generic_engine: aliengrep
+      generic_multiline: true
+      generic_extra_word_characters: ["-"]
+      generic_caseless: true
+    paths: 
+      include:
+      - '*.cbl'
+      - '*.cob'
+      - '*.ccp'
+      - '*.cpy'
+      - '*.sqb'
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAY OCCURS $SIZE TIMES
+                  ...
+                  MOVE $VAR TO $ARRAY($LEN) 
+              - metavariable-comparison:
+                  comparison: $LEN > $SIZE
+                  metavariable: $SIZE $LEN
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAY OCCURS $SIZE TIMES
+                  ...
+                  MOVE $ARRAY($LEN) TO $VAR
+              - metavariable-comparison:
+                  comparison: $LEN > $SIZE
+                  metavariable: $SIZE $LEN
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAYMAIN OCCURS $SIZE TIMES...
+                  $ARRAY PIC $X($VAL)
+                  ...
+                  MOVE $VAR TO $ARRAY($LEN) 
+              - metavariable-comparison:
+                  comparison: $LEN > $SIZE
+                  metavariable: $SIZE $LEN
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAYMAIN OCCURS $SIZE TIMES...
+                  $ARRAY PIC $X($VAL)
+                  ...
+                  MOVE $ARRAY($LEN) TO $VAR
+              - metavariable-comparison:
+                  comparison: $LEN > $SIZE
+                  metavariable: $SIZE $LEN
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAY OCCURS $SIZE TIMES
+                  ...
+                  MOVE $VAR TO $ARRAY($LEN) 
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAY OCCURS $SIZE TIMES
+                  ...
+                  MOVE $ARRAY($LEN) TO $VAR
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAYMAIN OCCURS $SIZE TIMES...
+                  $ARRAY PIC $X($VAL)
+                  ...
+                  MOVE $VAR TO $ARRAY($LEN)
+          - patterns:
+              - pattern-inside: |
+                  WORKING-STORAGE SECTION
+                  ...
+                  $ARRAYMAIN OCCURS $SIZE TIMES...
+                  $ARRAY PIC $X($VAL)
+                  ...
+                  MOVE $ARRAY($LEN) TO $VAR
