@@ -10,6 +10,10 @@ rules:
         - https://cwe.mitre.org/data/definitions/297.html
         - https://cwe.mitre.org/data/slices/919.html
       category: security
+      confidence: MEDIUM
+      likelihood: LOW
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application seems not implementing properly the Certificate Pinning checks when
       connecting to external web servers, with TrustKit libraries. 
