@@ -7,6 +7,10 @@ rules:
         - https://capec.mitre.org/data/definitions/676.html
         - https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05.6-Testing_for_NoSQL_Injection
       category: security
+      confidence: MEDIUM
+      likelihood: LOW
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application could be vulnerable to NoSQL Injection, because the NoSQL queries
       are built dynamically as string by concatenating code and untrusted input.

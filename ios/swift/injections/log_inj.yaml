@@ -8,6 +8,10 @@ rules:
         - https://owasp.org/www-community/Injection_Flaws
         - https://cwe.mitre.org/data/definitions/117.html
       category: security
+      confidence: MEDIUM
+      likelihood: LOW
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application could be vulnerable to Log Injection, as it seems that some
       untrusted input data is put into a logger without properly neutralizing it. 
