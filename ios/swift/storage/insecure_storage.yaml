@@ -7,6 +7,10 @@ rules:
         - https://mas.owasp.org/MASTG/iOS/0x06d-Testing-Data-Storage/
         - https://cwe.mitre.org/data/definitions/311.html
       category: security
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application seems using a insecure storage mechanism, that does not guarantee
       its confidentiality, to store some data locally into the device. 

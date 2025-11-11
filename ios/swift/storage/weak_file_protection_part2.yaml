@@ -9,6 +9,10 @@ rules:
         - https://developer.apple.com/documentation/foundation/nsfileprotectioncompleteuntilfirstuserauthentication
         - https://developer.apple.com/documentation/uikit/protecting_the_user_s_privacy/encrypting_your_app_s_files
       category: security
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application seems using a weak data protection class when storing some
       files locally into the device, this configuration could expose the files to undesiderated

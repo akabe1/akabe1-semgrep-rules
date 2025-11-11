@@ -8,6 +8,10 @@ rules:
         - https://developer.apple.com/documentation/foundation/nsfileprotectionnone
         - https://developer.apple.com/documentation/foundation/nsdatawritingoptions/nsdatawritingfileprotectionnone
       category: security
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application seems using a insufficient data protection class when storing some
       files locally into the device. The usage of the data protection class "NSFileProtectionNone" or
