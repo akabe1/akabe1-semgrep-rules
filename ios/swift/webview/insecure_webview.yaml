@@ -8,6 +8,10 @@ rules:
         - https://developer.apple.com/documentation/webkit/replacing_uiwebview_in_your_app
         - https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller
       category: security
+      confidence: MEDIUM
+      likelihood: LOW
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application seems using an insecure WebView in-app browser, which could expose
       to various kind of vulnerabilities.

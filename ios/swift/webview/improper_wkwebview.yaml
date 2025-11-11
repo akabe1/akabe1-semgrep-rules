@@ -7,6 +7,10 @@ rules:
         - https://mas.owasp.org/MASTG/iOS/0x06h-Testing-Platform-Interaction
         - https://developer.apple.com/documentation/webkit/wkwebview
       category: security
+      confidence: MEDIUM
+      likelihood: LOW
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application seems using a WKWebView object weakly configured from a security
       point of view, as its settings present any of the following flaws:
