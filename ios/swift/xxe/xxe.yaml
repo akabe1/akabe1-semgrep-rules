@@ -9,6 +9,10 @@ rules:
         - https://cwe.mitre.org/data/definitions/611.html
         - https://developer.apple.com/documentation/foundation/nsxmlparser/1414143-shouldresolveexternalentities
       category: security
+      confidence: MEDIUM
+      likelihood: LOW
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       The iOS mobile application could be vulnerable to XXE attacks, because the resolution of XML
       external entities in DTD is enabled on it. 
