@@ -9,6 +9,10 @@ rules:
         - https://support.apple.com/guide/security/keychain-data-protection-secb0694df1a/web
         - https://developer.apple.com/documentation/security/keychain_services/keychain_items/restricting_keychain_item_accessibility
       category: security
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: MEDIUM
+      technology: [ios]
     message: >-
       This iOS mobile application seems configured with a weak Keychain protection, because
       presents the deprecated Keychian attribute "kSecAttrAccessibleAlways" or 
