@@ -8,6 +8,10 @@ rules:
         - https://owasp.org/www-community/attacks/SQL_Injection
         - https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
       category: security
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: HIGH
+      technology: [ios]
     message: >-
       This iOS mobile application could be vulnerable to SQL Injection, because the SQL queries
       are built as string by concatenating code and untrusted input.
