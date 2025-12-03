@@ -215,17 +215,6 @@ rules:
                       NSLog("=~/.*(%@).*/", $ITEM.$FIELD)
                       ...
                     }
-          #rimuovere                
-          #- patterns:
-          #    - pattern-inside: |
-          #        $INPUT = navigationAction.request.url?.absoluteString
-          #        ...
-          #        $COMP = URLComponents(...)
-          #        ...
-          #        $ITEM = components.queryItems 
-          #        ...
-          #        NSLog($LOG, $ITEM.$FIELD)
-          #        NSLog("=~/.*(%@).*/", $ITEM.$FIELD)
           #    - metavariable-regex:
           #        metavariable: $LOG
           #        regex: ([\s\S]*?)(?=%@)([\s\S]*?)
